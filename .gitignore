@@ -1,0 +1,4 @@
+# Ignore nothing — this is a config/docs repo with no build artifacts
+# (No node_modules, no __pycache__, etc. — nothing to ignore)
+.DS_Store
+Thumbs.db

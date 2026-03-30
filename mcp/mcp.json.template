@@ -1,0 +1,67 @@
+{
+  "servers": {
+    "microsoft/playwright-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
+    },
+    "microsoft/markitdown": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["markitdown-mcp@0.0.1a4"]
+    },
+    "io.github.github/github-mcp-server": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/"
+    },
+    "oraios/serena": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [
+        "--from", "git+https://github.com/oraios/serena",
+        "serena", "start-mcp-server", "serena@latest",
+        "--context", "ide-assistant"
+      ]
+    },
+    "com.microsoft/nuget": {
+      "type": "stdio",
+      "command": "dnx",
+      "args": [
+        "NuGet.Mcp.Server@1.1.43",
+        "--yes",
+        "--source", "https://api.nuget.org/v3/index.json"
+      ]
+    },
+    "microsoftdocs/mcp": {
+      "type": "http",
+      "url": "https://learn.microsoft.com/api/mcp"
+    },
+    "io.github.wonderwhy-er/desktop-commander": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["--registry", "https://registry.npmjs.org", "@wonderwhy-er/desktop-commander@0.2.38"]
+    },
+    "io.github.mongodb-js/mongodb-mcp-server": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "mongodb-mcp-server@1.9.0",
+        "--connectionString", "${MDB_CONNECTION_STRING}"
+      ],
+      "env": {
+        "MDB_MCP_CONNECTION_STRING": "${MDB_CONNECTION_STRING}",
+        "MDB_MCP_API_CLIENT_ID": "${MDB_API_CLIENT_ID}",
+        "MDB_MCP_API_CLIENT_SECRET": "${MDB_API_CLIENT_SECRET}"
+      }
+    },
+    "com.postman/postman-mcp-server": {
+      "type": "http",
+      "url": "https://mcp.postman.com/mcp"
+    },
+    "io.github.ChromeDevTools/chrome-devtools-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["--registry", "https://registry.npmjs.org", "chrome-devtools-mcp@0.20.3"]
+    }
+  }
+}

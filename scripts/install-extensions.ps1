@@ -1,0 +1,59 @@
+# Install all recommended VS Code extensions for FamilyHub development
+# Run this after cloning the workspace repo.
+
+$extensions = @(
+    "aaron-bond.better-comments",
+    "batisteo.vscode-django",
+    "bradlc.vscode-tailwindcss",
+    "christian-kohler.npm-intellisense",
+    "christian-kohler.path-intellisense",
+    "davidanson.vscode-markdownlint",
+    "dbaeumer.vscode-eslint",
+    "docker.docker",
+    "donjayamanne.githistory",
+    "dsznajder.es7-react-js-snippets",
+    "eamodio.gitlens",
+    "esbenp.prettier-vscode",
+    "firefox-devtools.vscode-firefox-debug",
+    "formulahendry.auto-close-tag",
+    "formulahendry.auto-rename-tag",
+    "github.copilot-chat",
+    "github.vscode-github-actions",
+    "github.vscode-pull-request-github",
+    "heybourn.headwind",
+    "mechatroner.rainbow-csv",
+    "mhutchie.git-graph",
+    "ms-azuretools.vscode-azure-github-copilot",
+    "ms-azuretools.vscode-containers",
+    "ms-azuretools.vscode-docker",
+    "ms-edgedevtools.vscode-edge-devtools",
+    "ms-playwright.playwright",
+    "ms-python.debugpy",
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "ms-toolsai.jupyter",
+    "ms-vscode-remote.remote-containers",
+    "ms-vscode-remote.remote-ssh",
+    "ms-vscode-remote.remote-wsl",
+    "ms-vscode.live-server",
+    "ms-vscode.powershell",
+    "oderwat.indent-rainbow",
+    "redhat.vscode-yaml",
+    "styled-components.vscode-styled-components",
+    "usernamehw.errorlens",
+    "waderyan.gitblame",
+    "yzane.markdown-pdf"
+)
+
+Write-Host "`n=== FamilyHub: Installing VS Code Extensions ===" -ForegroundColor Cyan
+
+$total = $extensions.Count
+$i = 0
+foreach ($ext in $extensions) {
+    $i++
+    Write-Host "  [$i/$total] $ext" -ForegroundColor Gray
+    code --install-extension $ext --force 2>$null
+}
+
+Write-Host "`n[OK] All $total extensions installed." -ForegroundColor Green
+Write-Host "Reload VS Code to activate them."

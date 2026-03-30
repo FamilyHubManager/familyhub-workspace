@@ -1,0 +1,77 @@
+{
+    "folders": [
+        {
+            "name": "🏠 FamilyHub Root",
+            "path": "."
+        },
+        {
+            "name": "⚙️ Backend (Django)",
+            "path": "./familyhub-backend"
+        },
+        {
+            "name": "🎨 Frontend (React)",
+            "path": "./familyhub-frontend"
+        },
+        {
+            "name": "🧪 E2E + Launcher",
+            "path": "./familyhub-e2e"
+        },
+        {
+            "name": "📈 Ghostfolio Source",
+            "path": "./ghostfolio-src"
+        }
+    ],
+    "settings": {
+        "files.exclude": {
+            "**/node_modules": true,
+            "**/__pycache__": true,
+            "**/venv": false,
+            "**/.pytest_cache": true,
+            "**/.mypy_cache": true
+        },
+        "powershell.cwd": "🏠 FamilyHub Root"
+    },
+    "extensions": {
+        "recommendations": [
+            "ms-python.python",
+            "ms-python.vscode-pylance",
+            "ms-vscode.live-server",
+            "dbaeumer.vscode-eslint",
+            "esbenp.prettier-vscode",
+            "bradlc.vscode-tailwindcss"
+        ]
+    },
+    "launch": {
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "name": "🐍 Django Backend",
+                "type": "debugpy",
+                "request": "launch",
+                "program": "${workspaceFolder:Backend (Django)}/manage.py",
+                "args": [
+                    "runserver",
+                    "8000"
+                ],
+                "django": true,
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "⚛️ React Frontend",
+                "type": "chrome",
+                "request": "launch",
+                "url": "http://localhost:5173",
+                "webRoot": "${workspaceFolder:Frontend (React)}"
+            }
+        ],
+        "compounds": [
+            {
+                "name": "🚀 Full Stack",
+                "configurations": [
+                    "🐍 Django Backend",
+                    "⚛️ React Frontend"
+                ]
+            }
+        ]
+    }
+}

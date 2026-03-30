@@ -1,0 +1,39 @@
+{
+  "repos": [
+    {
+      "name": "FamilyHub Root (workspace launcher)",
+      "org": "FamilyHubManager",
+      "repo": "FamilyHubManager",
+      "cloneTo": ".",
+      "description": "Multi-root workspace root — contains workspace file, deploy scripts, and repo orchestration"
+    },
+    {
+      "name": "Backend (Django)",
+      "org": "FamilyHubManager",
+      "repo": "familyhub-backend",
+      "cloneTo": "./familyhub-backend",
+      "description": "Django REST API, Celery workers, PostgreSQL models"
+    },
+    {
+      "name": "Frontend (React)",
+      "org": "FamilyHubManager",
+      "repo": "familyhub-frontend",
+      "cloneTo": "./familyhub-frontend",
+      "description": "React + Vite + TailwindCSS SPA"
+    },
+    {
+      "name": "E2E + Launcher",
+      "org": "FamilyHubManager",
+      "repo": "familyhub-e2e",
+      "cloneTo": "./familyhub-e2e",
+      "description": "Playwright E2E tests + Docker Compose stacks + deploy scripts"
+    },
+    {
+      "name": "Ghostfolio Source",
+      "org": "FamilyHubManager",
+      "repo": "ghostfolio-src",
+      "cloneTo": "./ghostfolio-src",
+      "description": "Fork of Ghostfolio with FamilyHub docker-compose overlay"
+    }
+  ]
+}

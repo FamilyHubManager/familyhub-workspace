@@ -1,0 +1,154 @@
+{
+  // ============================================================
+  // REFERENCE: VS Code User-Level MCP Servers
+  // Location:  %APPDATA%\Code\User\mcp.json
+  //
+  // This file documents the global MCP servers installed at the
+  // user level.  Copy the "servers" block into your own mcp.json
+  // at that location.  VS Code will prompt for any ${input:…}
+  // values on first use; secrets are never stored in this file.
+  //
+  // For workspace-scoped servers see: ../.vscode/mcp.json
+  // For the setup script that populates mcp.json see: ../scripts/setup-mcp.ps1
+  // ============================================================
+  "servers": {
+
+    // ── Playwright browser automation ─────────────────────────
+    "microsoft/playwright-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
+    },
+
+    // ── MarkItDown file-to-markdown converter ─────────────────
+    "microsoft/markitdown": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["markitdown-mcp@0.0.1a4"]
+    },
+
+    // ── GitHub MCP (HTTP, auth via Copilot token) ─────────────
+    "io.github.github/github-mcp-server": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/"
+    },
+
+    // ── Serena semantic code agent ────────────────────────────
+    "oraios/serena": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/oraios/serena",
+        "serena",
+        "start-mcp-server",
+        "serena@latest",
+        "--context",
+        "ide-assistant"
+      ]
+    },
+
+    // ── NuGet package resolution ──────────────────────────────
+    "com.microsoft/nuget": {
+      "type": "stdio",
+      "command": "dnx",
+      "args": [
+        "NuGet.Mcp.Server@1.1.43",
+        "--yes",
+        "--source",
+        "https://api.nuget.org/v3/index.json"
+      ]
+    },
+
+    // ── Microsoft Docs / Learn ────────────────────────────────
+    "microsoftdocs/mcp": {
+      "type": "http",
+      "url": "https://learn.microsoft.com/api/mcp"
+    },
+
+    // ── Desktop Commander (filesystem + terminal) ─────────────
+    "io.github.wonderwhy-er/desktop-commander": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "--registry",
+        "https://registry.npmjs.org",
+        "@wonderwhy-er/desktop-commander@0.2.38"
+      ]
+    },
+
+    // ── MongoDB Atlas MCP ─────────────────────────────────────
+    // Secrets supplied via ${input:…} prompts; all args are optional.
+    // Only populate apiClientId/Secret to enable Atlas management tools.
+    // connectionString is needed for direct DB tools.
+    "io.github.mongodb-js/mongodb-mcp-server": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "mongodb-mcp-server@1.9.0",
+        "--connectionString",
+        "${input:MDB_connectionString}"
+      ],
+      "env": {
+        "MDB_MCP_API_CLIENT_ID": "${input:MDB_MCP_API_CLIENT_ID}",
+        "MDB_MCP_API_CLIENT_SECRET": "${input:MDB_MCP_API_CLIENT_SECRET}",
+        "MDB_MCP_CONNECTION_STRING": "${input:MDB_MCP_CONNECTION_STRING}"
+      }
+    },
+
+    // ── Postman MCP (HTTP, Bearer token) ─────────────────────
+    "com.postman/postman-mcp-server": {
+      "type": "http",
+      "url": "https://mcp.postman.com/mcp",
+      "headers": {
+        "Authorization": "${input:PostmanAuthorization}"
+      }
+    },
+
+    // ── Chrome DevTools Protocol ──────────────────────────────
+    "io.github.ChromeDevTools/chrome-devtools-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "--registry",
+        "https://registry.npmjs.org",
+        "chrome-devtools-mcp@0.20.3"
+      ]
+    }
+  },
+
+  // ── Input variable definitions ────────────────────────────
+  // VS Code prompts the user for these when a server first needs them.
+  "inputs": [
+    {
+      "id": "MDB_connectionString",
+      "type": "promptString",
+      "description": "MongoDB connection string (e.g. mongodb://localhost:27017)",
+      "password": true
+    },
+    {
+      "id": "MDB_MCP_API_CLIENT_ID",
+      "type": "promptString",
+      "description": "Atlas API client ID for authentication.",
+      "password": false
+    },
+    {
+      "id": "MDB_MCP_API_CLIENT_SECRET",
+      "type": "promptString",
+      "description": "Atlas API client secret for authentication.",
+      "password": true
+    },
+    {
+      "id": "MDB_MCP_CONNECTION_STRING",
+      "type": "promptString",
+      "description": "MongoDB connection string via env var.",
+      "password": true
+    },
+    {
+      "id": "PostmanAuthorization",
+      "type": "promptString",
+      "description": "Bearer token + Postman API key (e.g. 'Bearer PMAK-…')",
+      "password": true
+    }
+  ]
+}

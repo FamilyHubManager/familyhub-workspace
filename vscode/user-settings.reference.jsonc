@@ -1,0 +1,126 @@
+{
+    // ─── Explorer / UI ──────────────────────────────────────────────────────────
+    "explorer.confirmDragAndDrop": false,
+    "explorer.confirmPasteNative": false,
+    "notebook.lineNumbers": "on",
+    "json.maxItemsComputed": 50000,
+    "security.workspace.trust.untrustedFiles": "open",
+    "editor.linkedEditing": true,
+    "workbench.browser.enableChatTools": true,
+    "workbench.browser.openLocalhostLinks": true,
+    "chat.viewSessions.orientation": "stacked",
+    // ─── Git ────────────────────────────────────────────────────────────────────
+    "git.confirmSync": false,
+    // ─── Language Formatters (user defaults) ────────────────────────────────────
+    "[yaml]": {
+        "editor.defaultFormatter": "redhat.vscode-yaml"
+    },
+    "[jsonc]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "[markdown]": {
+        "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+    },
+    "[html]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[dockercompose]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    // ─── Python ─────────────────────────────────────────────────────────────────
+    "python.analysis.typeCheckingMode": "standard",
+    // ─── GitHub Copilot ─────────────────────────────────────────────────────────
+    "github.copilot.enable": {
+        "*": true,
+        "plaintext": false,
+        "markdown": false,
+        "scminput": false,
+        "groovy": false
+    },
+    "github.copilot.chat.anthropic.thinking.enabled": true,
+    "github.copilot.chat.alternateGptPrompt.enabled": true,
+    "github.copilot.chat.codesearch.enabled": true,
+    "github.copilot.chat.generateTests.codeLens": true,
+    "github.copilot.chat.languageContext.fix.typescript.enabled": true,
+    "github.copilot.chat.languageContext.inline.typescript.enabled": true,
+    "github.copilot.chat.newWorkspace.useContext7": true,
+    // ─── Copilot Chat / Agent ────────────────────────────────────────────────────
+    "chat.agent.maxRequests": 9999,
+    "chat.agent.thinking.collapsedTools": "all",
+    "chat.checkpoints.showFileChanges": true,
+    "chat.customAgentInSubagent.enabled": true,
+    "chat.editing.autoAcceptDelay": 100,
+    "chat.emptyState.history.enabled": true,
+    "chat.mcp.assisted.nuget.enabled": true,
+    "chat.mcp.gallery.enabled": true,
+    "chat.mcp.autostart": "never",
+    "chat.tools.terminal.autoReplyToPrompts": true,
+    "chat.useAgentSkills": true,
+    "chat.useNestedAgentsMdFiles": true,
+    // ─── MCP Server Model Sampling ───────────────────────────────────────────────
+    "chat.mcp.serverSampling": {
+        "Global in Code: io.github.github/github-mcp-server": {
+            "allowedModels": [
+                "copilot/gpt-4.1"
+            ]
+        }
+    },
+    // ─── URL Auto-approve (for fetch tool) ──────────────────────────────────────
+    "chat.tools.urls.autoApprove": {
+        "https://github.com": {
+            "approveRequest": false,
+            "approveResponse": true
+        }
+    },
+    // ─── GitLens ────────────────────────────────────────────────────────────────
+    "gitlens.ai.model": "vscode",
+    "gitlens.ai.vscode.model": "copilot:gpt-4.1",
+    // ─── Live Server ─────────────────────────────────────────────────────────────
+    "liveServer.settings.donotShowInfoMsg": true,
+    // ─── Misc ────────────────────────────────────────────────────────────────────
+    "docker.extension.enableComposeLanguageServer": false,
+    "jdk.telemetry.enabled": false,
+    // ─── Terminal Auto-approve ───────────────────────────────────────────────────
+    // Add commands you trust to run without confirmation in the Copilot agent:
+    "chat.tools.terminal.autoApprove": {
+        // git
+        "git add": true,
+        "git commit": true,
+        "git remote": true,
+        "git fetch": true,
+        "git checkout": true,
+        "git init": true,
+        "git status": true,
+        "git push": true,
+        "git pull": true,
+        // Node / npm
+        "npm install": true,
+        "npm run": true,
+        "npx": true,
+        "node --version": true,
+        // Python / pip
+        "pip": true,
+        // Docker
+        "docker --version": true,
+        // PowerShell builtins
+        "Test-Path": true,
+        "New-Item": true,
+        "Set-Location": true,
+        "Push-Location": true,
+        "Pop-Location": true,
+        "Copy-Item": true,
+        "Remove-Item": true,
+        "Get-Content": true,
+        "Set-Content": true,
+        "Out-Null": true,
+        "ConvertFrom-Json": true,
+        "ConvertTo-Json": true,
+        // .NET
+        "dotnet --version": true,
+        "dotnet tool": true,
+        "dotnet test": true,
+        // Database / cache
+        "psql": true,
+        "redis-cli": true
+    }
+}

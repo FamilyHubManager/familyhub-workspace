@@ -12,7 +12,6 @@
   // For the setup script that populates mcp.json see: ../scripts/setup-mcp.ps1
   // ============================================================
   "servers": {
-
     // ── Playwright browser automation ─────────────────────────
     "microsoft/playwright-mcp": {
       "type": "stdio",

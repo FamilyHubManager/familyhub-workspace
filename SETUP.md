@@ -41,6 +41,7 @@ D:\Projects\
 ```
 
 Clone manually if the script fails:
+
 ```powershell
 $base = "D:\Projects\FamilyHubManager"
 New-Item -ItemType Directory -Path $base -Force
@@ -76,17 +77,18 @@ No additional token needed — just sign in to GitHub Copilot in VS Code.
 
 Requires a MongoDB Atlas connection string and optionally Atlas API credentials.
 
-1. Go to https://cloud.mongodb.com → your cluster → **Connect** → **Drivers**
+1. Go to <https://cloud.mongodb.com> → your cluster → **Connect** → **Drivers**
 2. Copy the `mongodb+srv://` connection string
 3. Run `.\scripts\setup-mcp.ps1` and paste when prompted
 
 For Atlas management tools (create clusters, manage users), also create an API key:
+
 1. Atlas → Project Settings → Access Manager → API Keys → Create
 2. Save the Client ID and Client Secret — they're shown once
 
 ### Postman MCP Server
 
-1. Install Postman desktop app: https://postman.com/downloads
+1. Install Postman desktop app: <https://postman.com/downloads>
 2. Sign in to your Postman account
 3. The MCP server at `https://mcp.postman.com/mcp` authenticates via the app
 
@@ -104,8 +106,8 @@ docker compose -f docker-compose.dev.yml up -d
 docker ps --format "table {{.Names}}\t{{.Status}}"
 ```
 
-Backend API: http://localhost:8000
-Frontend:    http://localhost:5173
+Backend API: <http://localhost:8000>
+Frontend:    <http://localhost:5173>
 
 ---
 
@@ -141,17 +143,21 @@ Copy `ghostfolio-src/familyhub/.env.example` to `ghostfolio-src/familyhub/.env` 
 ## 7. Troubleshooting
 
 ### MCP server not starting
+
 - Check VS Code Output panel → **MCP: <server-name>**
 - For `uvx` servers: run `uvx --version` in terminal — if not found, install uv: `pip install uv`
 - For `npx` servers: run `node --version` — needs Node 20+
 - For `dnx` (NuGet): run `dotnet --version` — needs .NET 9+
 
 ### Extensions not installing
+
 - Run `code --install-extension <ext-id> --force` manually for failing extensions
 - Check VS Code extension marketplace connectivity
 
 ### Repos cloning with wrong branch
+
 The default branch for each repo:
+
 - `familyhub-backend`: `main`
 - `familyhub-frontend`: `main`
 - `familyhub-e2e`: `main`

@@ -1,0 +1,48 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Current File",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Python: Django Tests",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder:⚙️ Backend (Django)}/manage.py",
+      "args": ["test", "--keepdb"],
+      "django": true,
+      "justMyCode": false,
+      "console": "integratedTerminal",
+      "env": {
+        "DJANGO_SETTINGS_MODULE": "config.settings"
+      }
+    },
+    {
+      "name": "Python: pytest",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["-v", "--tb=short"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder:⚙️ Backend (Django)}",
+      "env": {
+        "DJANGO_SETTINGS_MODULE": "config.settings"
+      }
+    },
+    {
+      "name": "Edge: Launch Frontend",
+      "type": "msedge",
+      "request": "launch",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder:🎨 Frontend (React)}",
+      "sourceMapPathOverrides": {
+        "webpack:///src/*": "${webRoot}/src/*"
+      }
+    }
+  ]
+}

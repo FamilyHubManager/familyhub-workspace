@@ -40,6 +40,8 @@
         "styled-components.vscode-styled-components",
         "usernamehw.errorlens",
         "waderyan.gitblame",
-        "yzane.markdown-pdf"
+        "yzane.markdown-pdf",
+        "jock.svg",
+        "ritwickdey.liveserver"
     ]
 }

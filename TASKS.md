@@ -1,6 +1,6 @@
 # FamilyHub - Task Tracker
 
-> Updated: 2026-04-06
+> Updated: 2026-03-31
 > Branch: `release/v1.0.0`
 
 ---
@@ -53,7 +53,40 @@
 | P6 | Export XLSX from eToro: Portfolio -> History -> Account Statement -> Download | pending | Requires eToro login; export as Excel |
 | P7 | Run each import script and verify output JSON | pending | Test with --dry-run flag first |
 | P8 | POST JSON to Ghostfolio API: `POST http://localhost:3333/api/v1/import` | pending | Set Bearer token from Ghostfolio Settings -> Security Token |
-| P9 | Verify imported holdings appear in Ghostfolio portfolio view | pending | Open http://localhost:3333 and check Holdings tab |
+| P9 | Verify imported holdings appear in Ghostfolio portfolio view | pending | Open <http://localhost:3333> and check Holdings tab |
+
+---
+
+## Ghostfolio Platform Import Wizard (2026-03-31)
+
+> **Goal:** add a guided multi-step import UI inside Ghostfolio itself (Revolut / Binance / eToro /
+> Generic), with browser-side CSV conversion feeding into the existing Ghostfolio dry-run flow.
+> No Django backend changes — all logic lives inside the Angular client.
+
+| # | Step | Status | Notes |
+| --- | --- | --- | --- |
+| UI1 | `platform-import.service.ts` — browser-side converters for Revolut / Binance / eToro CSV → `CreateOrderDto[]` | done | `ghostfolio-src/apps/client/src/app/services/platform-import.service.ts` |
+| UI2 | Extend `ImportStep` enum: add `PLATFORM_SELECT=0`, `EXPORT_GUIDE=1`; renumber existing to 2/3 | done | `import-activities-dialog/enums/import-step.ts` |
+| UI3 | Dialog HTML: 4-step MatStepper (platform cards → export guide → file upload → review & import) | done | `import-activities-dialog.html` |
+| UI4 | Dialog component: inject `PlatformImportService`, wire `onSelectPlatform`, `onSkipOrContinueGuide`, platform-aware `handleFile` | done | `import-activities-dialog.component.ts` |
+| UI5 | SCSS: `.platform-grid`, `.platform-card`, `.export-steps` styles | done | `import-activities-dialog.scss` |
+| UI6 | Fix Docker entrypoint CRLF: `entrypoint.sh` had Windows line endings → `#!/bin/sh\r` unrecognised on Linux | done | compose override + source file converted to LF + Dockerfile `RUN sed` |
+| UI7 | Build custom Ghostfolio Docker image from `ghostfolio-src/` and deploy via `ghostfolio-src/familyhub/docker-compose.yml` | done | `name: ghostfolio` preserves existing DB volumes |
+
+---
+
+## Ghostfolio EUR / RON Currency Support (2026-03-31)
+
+> **Goal:** Ghostfolio ships with only USD/USX. Add EUR and RON so accounts, portfolio, and
+> imported activities all work with European currencies.
+
+| # | Step | Status | Notes |
+| --- | --- | --- | --- |
+| C1 | Upsert `CURRENCIES` property in DB: `["EUR", "RON"]` via `seed_currencies.py` | done | `ghostfolio-src/familyhub/seed_currencies.py`; run against live DB |
+| C2 | Fix `property.service.ts` default: change hardcoded `[]` fallback to `['EUR', 'RON', 'USD']` | done | `ghostfolio-src/apps/api/src/services/property/property.service.ts` |
+| C3 | `platform-import.service.ts`: Binance pair quotes now map to EUR/RON/GBP/CHF (not just USD); eToro detects account currency; Revolut fallback changed USD→EUR | done | |
+| C4 | Rebuild Docker image and restart `ghostfolio_app` | done | Container restarted; EUR/RON/USD/USX confirmed in API `/v1/info` |
+| C5 | Verify EUR and RON appear in "Add Account → Currency" dropdown | done | Confirmed via `GET /api/v1/info` → `currencies: ["EUR","RON","USD","USX"]` |
 
 ---
 
@@ -90,11 +123,11 @@
 | B7 | Google Drive sync | Low | Infrastructure exists |
 | B8 | WhatsApp reminders | Low | `whatsapp-service/` exists |
 | B9 | Bulk category assignment | Low | |
-| B10 | Ghostfolio first-time setup: register, save Security Token, configure `ACCESS_TOKEN_SALT` | infra | done - `ghostfolio/docker-compose.yml` in place; run `docker compose up -d`, open http://localhost:3333 |
+| B10 | Ghostfolio first-time setup: register, save Security Token, configure `ACCESS_TOKEN_SALT` | infra | done - `ghostfolio/docker-compose.yml` in place; run `docker compose up -d`, open <http://localhost:3333> |
 | B11 | Import Revolut Stocks portfolio into Ghostfolio | investments | done - `import_revolut.py` created; export CSV from Revolut app -> Profile -> Statements |
 | B12 | Import eToro portfolio into Ghostfolio | investments | done - `import_etoro.py` created; export XLSX from eToro Account Statement |
 | B13 | Import TradeVille portfolio into Ghostfolio | investments | done - `tradeville_to_ghostfolio.py` converts CSV/XLSX to Ghostfolio JSON |
-| B14 | FamilyHub Dashboard widget or sidebar link to Ghostfolio (http://localhost:3333) | frontend | done - Sidebar nav item "Investments" added with TrendingUp icon |
+| B14 | FamilyHub Dashboard widget or sidebar link to Ghostfolio (<http://localhost:3333>) | frontend | done - Sidebar nav item "Investments" added with TrendingUp icon |
 
 ---
 

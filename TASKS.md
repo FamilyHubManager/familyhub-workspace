@@ -333,3 +333,21 @@
 | 86 | Lint + security sweep: 1211 flake8 issues → 0; 6 ESLint warnings → 0; Python CVEs: Pillow→>=12.1.1, cryptography→>=46.0; npm audit frontend 24→11 (remaining are dev-only build tools); npm audit e2e → 0 | all | 2026-04-02 |
 | 87 | security-audit.ps1: unified bandit/safety/flake8/ESLint/npm-audit report generator — added to deploy-to-prod.ps1 as STEP 0 (non-blocking) | e2e/infra | 2026-04-02 |
 | 88 | Paying roles (Tenant/Comodatar) financial features: per-role rent/due-day/currency overrides (inherit from apartment), warranty tracking (garantie de chirie) with paid/returned dates, partial payment ledger with surplus/deficit balance toggle — IdentityRole model extended, Payment.identity_role FK, new payment_summary + record_payment API actions, RoleAssignmentModal Financial+Warranty+Payments sections | backend+frontend | 2026-04-02 |
+| 89 | Dual-LLM architecture: QwQ:32b as reasoning/primary LLM (GPU, chain-of-thought, platform system prompt) + llama3.2:3b as translate LLM (CPU); two separate Ollama containers; strip_think_tags helper; _translate_summary step; comprehensive PLATFORM_SYSTEM_PROMPT FamilyHub knowledge base | backend+infra | 2026-04-03 |
+
+---
+
+## LLM Enrichment Roadmap
+
+> **Architecture baseline (task 89):** Primary LLM = `qwq:32b` (reasoning, GPU), Translate LLM = `llama3.2:3b` (EN↔RO, CPU).
+
+| # | Feature | Area | Status |
+| --- | --- | --- | --- |
+| LLM1 | **Support Chatbox**: `/api/v1/ai/chat/` streaming endpoint + frontend chat widget (drawer or floating bubble); platform context injected so LLM can answer questions about rent, documents, tasks | backend+frontend | backlog |
+| LLM2 | **Bulk re-analysis**: re-run document analysis pipeline on all existing documents that were labeled by the old llama3.2:3b model; mark them `ai_labeling_status=NOT_PROCESSED` in a migration + Celery batch | backend | backlog |
+| LLM3 | **Context-aware rent advice**: after a new tenant role is assigned, LLM suggests a rent price based on apartment size, floor, building, area, and existing rent history in the platform | backend+frontend | backlog |
+| LLM4 | **Natural-language search**: "show me all contracts expiring this year" → LLM converts to structured filter params passed to document/task/payment API | backend+frontend | backlog |
+| LLM5 | **Bundle auto-suggestion**: after uploading documents, LLM inspects new uploads and suggests bundle groupings (e.g. "these 3 docs look like a full comodat dossier — create bundle?") | backend+frontend | backlog |
+| LLM6 | **WhatsApp AI assistant**: answer WhatsApp questions about upcoming bills, tasks, or rent status using the same primary LLM with FamilyHub context | backend | backlog |
+| LLM7 | **Document draft generator**: given a document type (comodat, rental contract), LLM fills a template using stored person/apartment data and produces a downloadable PDF draft | backend+frontend | backlog |
+| LLM8 | **Payment anomaly detection**: weekly Celery job runs LLM over payment history; flags unusual gaps, irregular amounts, or missed rent as Tasks/notifications | backend | backlog |

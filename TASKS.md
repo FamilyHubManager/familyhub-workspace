@@ -332,3 +332,4 @@
 | 85 | feature-workflow.instructions.md: Phase 0 (read/update TASKS.md before/after every task) | root | 2026-04-02 |
 | 86 | Lint + security sweep: 1211 flake8 issues → 0; 6 ESLint warnings → 0; Python CVEs: Pillow→>=12.1.1, cryptography→>=46.0; npm audit frontend 24→11 (remaining are dev-only build tools); npm audit e2e → 0 | all | 2026-04-02 |
 | 87 | security-audit.ps1: unified bandit/safety/flake8/ESLint/npm-audit report generator — added to deploy-to-prod.ps1 as STEP 0 (non-blocking) | e2e/infra | 2026-04-02 |
+| 88 | Paying roles (Tenant/Comodatar) financial features: per-role rent/due-day/currency overrides (inherit from apartment), warranty tracking (garantie de chirie) with paid/returned dates, partial payment ledger with surplus/deficit balance toggle — IdentityRole model extended, Payment.identity_role FK, new payment_summary + record_payment API actions, RoleAssignmentModal Financial+Warranty+Payments sections | backend+frontend | 2026-04-02 |

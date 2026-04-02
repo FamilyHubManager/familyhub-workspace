@@ -204,6 +204,7 @@
 | I5 | `formatCurrency` missing currency param - all amounts showed EUR sign regardless of apartment currency | frontend | fixed | `e4c29da` |
 | I6 | Negative floor display: demisol apartments showed "floor 0" instead of "-1" | frontend | fixed | `ffe638b` |
 | I7 | Stale GHCR Docker image cached - prod did not pick up latest frontend build | infra | fixed | Deploy script now forces image pull |
+| I8 | 11 frontend npm vulns in dev-only build tools (esbuild, vite, vitest, workbox-build): 3 HIGH, 8 MOD | frontend/infra | accepted risk | All are dev-only build tools NOT included in production Docker image (nginx serves compiled static assets). No action required until next major Vite/Vitest release. |
 
 ---
 
@@ -329,3 +330,5 @@
 | 83 | Documents page: move 'Select' button above view switcher (below filter row, above document list) | frontend | 2026-04-02 |
 | 84 | Documents table view: column header multi-select dropdown filters (OR/AND/NOT + exclude) for status, category, tags, AI status columns | frontend | 2026-04-02 |
 | 85 | feature-workflow.instructions.md: Phase 0 (read/update TASKS.md before/after every task) | root | 2026-04-02 |
+| 86 | Lint + security sweep: 1211 flake8 issues → 0; 6 ESLint warnings → 0; Python CVEs: Pillow→>=12.1.1, cryptography→>=46.0; npm audit frontend 24→11 (remaining are dev-only build tools); npm audit e2e → 0 | all | 2026-04-02 |
+| 87 | security-audit.ps1: unified bandit/safety/flake8/ESLint/npm-audit report generator — added to deploy-to-prod.ps1 as STEP 0 (non-blocking) | e2e/infra | 2026-04-02 |

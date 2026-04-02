@@ -104,6 +104,7 @@
 > saved filter. Bundles also give Ollama richer context for link recommendations.
 >
 > **Data model:**
+>
 > ```
 > DocumentBundle
 >   id, name, description, icon, color
@@ -113,10 +114,12 @@
 >   documents ──M2M→ Document  (through BundleDocument: bundle, document, added_at, added_by)
 >   created_by, created_at, updated_at
 > ```
+>
 > Sub-bundle depth is unlimited. `get_subtree_ids()` walks children recursively to resolve
 > the full document set when filtering.
 >
 > **API surface (`/api/v1/bundles/`):**
+>
 > - CRUD on bundles;  `GET .../tree/` → full nested tree for sidebar
 > - `POST .../suggest/` + `{"document_ids": [...]}` → Ollama suggests name + sub-groupings
 > - `POST {id}/add_documents/` / `remove_documents/` / `refresh_smart/`
@@ -156,16 +159,19 @@
 > and to the identity who owns the car".
 >
 > **Orchestration:**
+>
 > ```
 > POST /api/v1/links/recommend/document/<id>/
 >   Phase 1 (sync, fast):   rule-based text/address matching  → PENDING links
 >   Phase 2 (async Celery): OllamaLinkRecommender             → upgrades confidence / adds new links
 >                           context = {title, tags, summary, bundle_paths, entities_already_linked}
 > ```
+>
 > `recommend_for_bundle(bundle_id)` — after bulk-adding docs to a bundle, runs Phase 2 on all
 > of them at once and cross-links documents within the bundle that share entities/topics.
 >
 > **Prompt context injected per document:**
+>
 > - `title`, `document_type` (from `ai_extracted_data`)
 > - `approved_tags` key/label pairs
 > - first 500 chars of `ocr_text` / `ai_extracted_data.summary`
@@ -318,3 +324,8 @@
 | 79 | Document-Identity Role M2M link: attach documents to specific role records in ApartmentDetail; new DocumentRoleLink model + API + UI | backend+frontend | `e8ef8c9` / `fd84333` |
 | 80 | deploy-to-prod.ps1 robustness improvements: better logging, error handling, stack ordering | e2e/infra | `163b5f2` |
 | 81 | Portfolio import scripts: import_revolut.py, import_binance.py, import_etoro.py for Ghostfolio | ghostfolio | - |
+
+| 82 | Documents label filter dropdown: ?label=key backend filter + frontend select; label badge in active filters | backend+frontend | 2026-04-02 |
+| 83 | Documents page: move 'Select' button above view switcher (below filter row, above document list) | frontend | 2026-04-02 |
+| 84 | Documents table view: column header multi-select dropdown filters (OR/AND/NOT + exclude) for status, category, tags, AI status columns | frontend | 2026-04-02 |
+| 85 | feature-workflow.instructions.md: Phase 0 (read/update TASKS.md before/after every task) | root | 2026-04-02 |

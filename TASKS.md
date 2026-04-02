@@ -1,6 +1,6 @@
 # FamilyHub - Task Tracker
 
-> Updated: 2026-03-31
+> Updated: 2026-04-02
 > Branch: `release/v1.0.0`
 
 ---
@@ -93,6 +93,97 @@
 ## In Progress
 
 *(nothing currently active)*
+
+---
+
+## Document Bundle System (2026-04-02)
+
+> **Goal:** hierarchical document grouping (bundles-of-bundles) so that ~90 documents can be
+> organised into nested packs (e.g. Car → Purchase, Service, Fines), browsed as trees, and
+> used as first-class filters everywhere documents appear. Smart bundles auto-populate from a
+> saved filter. Bundles also give Ollama richer context for link recommendations.
+>
+> **Data model:**
+> ```
+> DocumentBundle
+>   id, name, description, icon, color
+>   parent ──FK→ self (null = root bundle)
+>   is_smart: bool          # True = auto-populate from filter_config
+>   filter_config: JSON     # {"owners":["eu"], "categories":["auto"], "tags":["masina"]}
+>   documents ──M2M→ Document  (through BundleDocument: bundle, document, added_at, added_by)
+>   created_by, created_at, updated_at
+> ```
+> Sub-bundle depth is unlimited. `get_subtree_ids()` walks children recursively to resolve
+> the full document set when filtering.
+>
+> **API surface (`/api/v1/bundles/`):**
+> - CRUD on bundles;  `GET .../tree/` → full nested tree for sidebar
+> - `POST .../suggest/` + `{"document_ids": [...]}` → Ollama suggests name + sub-groupings
+> - `POST {id}/add_documents/` / `remove_documents/` / `refresh_smart/`
+> - `GET {id}/documents/` → all docs in bundle + every sub-bundle
+>
+> **Document filter:** `?bundle=<id>` on `GET /api/v1/documents/` resolves full subtree.
+
+| # | Step | Status | Notes |
+| --- | --- | --- | --- |
+| BUN1 | `apps/bundles/` Django app: `DocumentBundle` + `BundleDocument` models; `get_subtree_ids()` + `get_all_documents()` methods | pending | New app; add to `INSTALLED_APPS` |
+| BUN2 | Serializers: `BundleTreeSerializer` (nested children), `BundleFlatSerializer`, `BundleDocumentSerializer` | pending | `apps/bundles/serializers.py` |
+| BUN3 | Views: `BundleViewSet` with CRUD + `tree`, `documents`, `add_documents`, `remove_documents`, `suggest`, `refresh_smart` actions | pending | `apps/bundles/views.py` |
+| BUN4 | Document filter: add `?bundle=<id>` to `DocumentViewSet.get_queryset()` using subtree resolver | pending | `apps/documents/views.py` + `filterset_fields` |
+| BUN5 | Wire URL: `router.register('bundles', BundleViewSet)` in `config/urls.py` | pending | |
+| BUN6 | Migrations: `python manage.py makemigrations bundles` | pending | Must be committed before deploy |
+| BUN7 | Backend tests: `apps/bundles/tests/test_bundle.py` — subtree resolver, add/remove docs, smart bundle refresh, API CRUD, `?bundle=` filter | pending | `pytest.mark.unit` + `pytest.mark.integration` |
+| BUN8 | Frontend: `src/pages/Bundles/BundlePage.tsx` — left panel tree (nested expand/collapse), right panel document grid filtered by selected bundle | pending | |
+| BUN9 | Frontend: multi-select in document list + "Add to bundle" / "Create bundle" toolbar button | pending | |
+| BUN10 | Frontend: bundle filter pills row above document grid (click to filter; breadcrumb path shown) | pending | |
+| BUN11 | Frontend tests: `BundlePage.test.tsx` — tree renders, select bundle filters docs, create bundle modal | pending | Vitest + RTL |
+| BUN12 | Add `bundle` entity type to `EntityLink.EntityType` so bundles can be linked to other entities | pending | `apps/links/models.py` |
+| BUN13 | Add `EntityType.BUNDLE` resolver to `_resolve_entity_name` in `links/serializers.py` | pending | |
+| BUN14 | Sidebar nav: add "Bundles" entry with folder icon | pending | `src/layouts/Sidebar.tsx` or equivalent |
+| BUN15 | Deploy (Phase 3): run `deploy-to-prod.ps1`, verify containers Up, smoke-test bundle CRUD via browser | pending | |
+
+---
+
+## Ollama Smart Linking Enhancement (2026-04-02)
+
+> **Goal:** upgrade the current rule-based recommender in `apps/links/recommender.py` so that
+> Ollama (llama3.2, GPU) acts as a second-pass semantic engine. Rule-based text matching remains
+> as a fast Phase 1. Ollama runs Phase 2 with richer context.
+>
+> **Why bundles matter for linking:** bundle membership is the strongest contextual signal.
+> "This document is in bundle Car › Service" tells Ollama far more than raw OCR text alone.
+> Ollama can then say "this looks like a receipt for a car service — link to the car bundle
+> and to the identity who owns the car".
+>
+> **Orchestration:**
+> ```
+> POST /api/v1/links/recommend/document/<id>/
+>   Phase 1 (sync, fast):   rule-based text/address matching  → PENDING links
+>   Phase 2 (async Celery): OllamaLinkRecommender             → upgrades confidence / adds new links
+>                           context = {title, tags, summary, bundle_paths, entities_already_linked}
+> ```
+> `recommend_for_bundle(bundle_id)` — after bulk-adding docs to a bundle, runs Phase 2 on all
+> of them at once and cross-links documents within the bundle that share entities/topics.
+>
+> **Prompt context injected per document:**
+> - `title`, `document_type` (from `ai_extracted_data`)
+> - `approved_tags` key/label pairs
+> - first 500 chars of `ocr_text` / `ai_extracted_data.summary`
+> - bundle membership paths: `["Car", "Car › Service docs"]`
+> - already-accepted entity links (to avoid re-suggesting them)
+> - all Identity names + all building addresses (as candidate targets)
+
+| # | Step | Status | Notes |
+| --- | --- | --- | --- |
+| OLL1 | `services/ai/link_recommender.py`: class `OllamaLinkRecommender` with `recommend(doc, context) → list[LinkSuggestion]`; prompt template; JSON parsing with fallback | pending | |
+| OLL2 | `apps/links/recommender.py`: add `recommend_for_document_ai(doc)` that builds full context (bundles included) and calls `OllamaLinkRecommender` | pending | Gated by `settings.OLLAMA_ENABLED`; skipped gracefully if Ollama offline |
+| OLL3 | Celery task `apps/links/tasks.py`: `run_ai_link_recommendations(doc_id)` — called async after OCR completes and after any bundle membership change | pending | |
+| OLL4 | `recommend_for_bundle(bundle_id)` — batch AI recommendation across all documents in a bundle; cross-document links for shared entities/topics | pending | `apps/links/recommender.py` |
+| OLL5 | Hook: after `BundleDocument` save, queue `run_ai_link_recommendations` for the newly added document | pending | `apps/bundles/models.py` post-save signal or viewset action |
+| OLL6 | Hook: after document OCR + AI labeling completes, queue `run_ai_link_recommendations` automatically | pending | `apps/documents/tasks.py` — already calls `analyze_document_with_ai`; extend pipeline |
+| OLL7 | Prompt context: include bundle paths in all existing AI prompts (document analyzer, auto-label) so Ollama can use bundle membership when suggesting tags/categories | pending | `services/ai/document_analyzer.py` |
+| OLL8 | Backend tests: `apps/links/tests/test_ai_recommender.py` — mock Ollama; test context builder, JSON parse fallback, bundle path injection | pending | `pytest.mark.unit` |
+| OLL9 | Deploy (Phase 3): run `deploy-to-prod.ps1`; verify Celery picks up new task; run manual recommendation on 1 document and inspect results | pending | |
 
 ---
 

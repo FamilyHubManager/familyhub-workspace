@@ -190,6 +190,8 @@ Nothing currently active.
 | OLL7 | Prompt context: include bundle paths in all existing AI prompts (document analyzer, auto-label) so Ollama can use bundle membership when suggesting tags/categories | done | |
 | OLL8 | Backend tests: `apps/links/tests/test_ai_recommender.py` — mock Ollama; test context builder, JSON parse fallback, bundle path injection | done | 19 tests |
 | OLL9 | Deploy (Phase 3): run `deploy-to-prod.ps1`; verify Celery picks up new task; run manual recommendation on 1 document and inspect results | done | Deployed 2026-04-03 |
+| OLL10 | Compact document analysis prompt + 16384 ctx window: `DOCUMENT_ANALYSIS_SYSTEM_PROMPT` (<150 tokens), OCR truncation 4000→2000 chars, `num_ctx` 8192→16384, `_repair_truncated_json()` fallback | done | Deployed 2026-04-03 |
+| OLL11 | Ollama idle GPU unload + cold-start user notification: `OLLAMA_KEEP_ALIVE=15m` (primary) / `5m` (translate); `is_loaded()` on `/api/ps`; bot sends "AI se încarcă" + auto-retry; translate stays dormant until primary calls it; timeout (10,300)→(30,600) | done | Deployed 2026-04-03 |
 
 ---
 
@@ -328,7 +330,6 @@ Nothing currently active.
 | 79 | Document-Identity Role M2M link: attach documents to specific role records in ApartmentDetail; new DocumentRoleLink model + API + UI | backend+frontend | `e8ef8c9` / `fd84333` |
 | 80 | deploy-to-prod.ps1 robustness improvements: better logging, error handling, stack ordering | e2e/infra | `163b5f2` |
 | 81 | Portfolio import scripts: import_revolut.py, import_binance.py, import_etoro.py for Ghostfolio | ghostfolio | - |
-
 | 82 | Documents label filter dropdown: ?label=key backend filter + frontend select; label badge in active filters | backend+frontend | 2026-04-02 |
 | 83 | Documents page: move 'Select' button above view switcher (below filter row, above document list) | frontend | 2026-04-02 |
 | 84 | Documents table view: column header multi-select dropdown filters (OR/AND/NOT + exclude) for status, category, tags, AI status columns | frontend | 2026-04-02 |

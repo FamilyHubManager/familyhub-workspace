@@ -109,8 +109,8 @@ Write-Step "Backup complete"
 foreach ($d in $validDests) {
     if (Test-Path $d) {
         $allFiles = Get-ChildItem $d -Recurse -File -ErrorAction SilentlyContinue
-        $fileCount = if ($allFiles -ne $null) { @($allFiles).Count } else { 0 }
-        $totalMB = if ($allFiles -ne $null) { [math]::Round((@($allFiles) | Measure-Object -Property Length -Sum).Sum / 1MB, 1) } else { 0 }
+        $fileCount = if ($null -ne $allFiles) { @($allFiles).Count } else { 0 }
+        $totalMB = if ($null -ne $allFiles) { [math]::Round((@($allFiles) | Measure-Object -Property Length -Sum).Sum / 1MB, 1) } else { 0 }
         Write-OK "$d -- $fileCount files, $totalMB MB total"
     }
 }

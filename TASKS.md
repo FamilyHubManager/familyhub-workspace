@@ -92,7 +92,7 @@
 
 ## In Progress
 
-*(nothing currently active)*
+Nothing currently active.
 
 ---
 
@@ -105,7 +105,7 @@
 >
 > **Data model:**
 >
-> ```
+> ```text
 > DocumentBundle
 >   id, name, description, icon, color
 >   parent ──FK→ self (null = root bundle)
@@ -129,21 +129,21 @@
 
 | # | Step | Status | Notes |
 | --- | --- | --- | --- |
-| BUN1 | `apps/bundles/` Django app: `DocumentBundle` + `BundleDocument` models; `get_subtree_ids()` + `get_all_documents()` methods | pending | New app; add to `INSTALLED_APPS` |
-| BUN2 | Serializers: `BundleTreeSerializer` (nested children), `BundleFlatSerializer`, `BundleDocumentSerializer` | pending | `apps/bundles/serializers.py` |
-| BUN3 | Views: `BundleViewSet` with CRUD + `tree`, `documents`, `add_documents`, `remove_documents`, `suggest`, `refresh_smart` actions | pending | `apps/bundles/views.py` |
-| BUN4 | Document filter: add `?bundle=<id>` to `DocumentViewSet.get_queryset()` using subtree resolver | pending | `apps/documents/views.py` + `filterset_fields` |
-| BUN5 | Wire URL: `router.register('bundles', BundleViewSet)` in `config/urls.py` | pending | |
-| BUN6 | Migrations: `python manage.py makemigrations bundles` | pending | Must be committed before deploy |
-| BUN7 | Backend tests: `apps/bundles/tests/test_bundle.py` — subtree resolver, add/remove docs, smart bundle refresh, API CRUD, `?bundle=` filter | pending | `pytest.mark.unit` + `pytest.mark.integration` |
-| BUN8 | Frontend: `src/pages/Bundles/BundlePage.tsx` — left panel tree (nested expand/collapse), right panel document grid filtered by selected bundle | pending | |
-| BUN9 | Frontend: multi-select in document list + "Add to bundle" / "Create bundle" toolbar button | pending | |
-| BUN10 | Frontend: bundle filter pills row above document grid (click to filter; breadcrumb path shown) | pending | |
-| BUN11 | Frontend tests: `BundlePage.test.tsx` — tree renders, select bundle filters docs, create bundle modal | pending | Vitest + RTL |
-| BUN12 | Add `bundle` entity type to `EntityLink.EntityType` so bundles can be linked to other entities | pending | `apps/links/models.py` |
-| BUN13 | Add `EntityType.BUNDLE` resolver to `_resolve_entity_name` in `links/serializers.py` | pending | |
-| BUN14 | Sidebar nav: add "Bundles" entry with folder icon | pending | `src/layouts/Sidebar.tsx` or equivalent |
-| BUN15 | Deploy (Phase 3): run `deploy-to-prod.ps1`, verify containers Up, smoke-test bundle CRUD via browser | pending | |
+| BUN1 | `apps/bundles/` Django app: `DocumentBundle` + `BundleDocument` models; `get_subtree_ids()` + `get_all_documents()` methods | done | |
+| BUN2 | Serializers: `BundleTreeSerializer` (nested children), `BundleFlatSerializer`, `BundleDocumentSerializer` | done | |
+| BUN3 | Views: `BundleViewSet` with CRUD + `tree`, `documents`, `add_documents`, `remove_documents`, `suggest`, `refresh_smart` actions | done | |
+| BUN4 | Document filter: add `?bundle=<id>` to `DocumentViewSet.get_queryset()` using subtree resolver | done | |
+| BUN5 | Wire URL: `router.register('bundles', BundleViewSet)` in `config/urls.py` | done | |
+| BUN6 | Migrations: `python manage.py makemigrations bundles` | done | |
+| BUN7 | Backend tests: `apps/bundles/tests/test_bundle.py` — subtree resolver, add/remove docs, smart bundle refresh, API CRUD, `?bundle=` filter | done | |
+| BUN8 | Frontend: `src/pages/Bundles/BundlePage.tsx` — left panel tree (nested expand/collapse), right panel document grid filtered by selected bundle | done | |
+| BUN9 | Frontend: multi-select in document list + "Add to bundle" / "Create bundle" toolbar button | done | |
+| BUN10 | Frontend: bundle filter pills row above document grid (click to filter; breadcrumb path shown) | done | |
+| BUN11 | Frontend tests: `BundlePage.test.tsx` — tree renders, select bundle filters docs, create bundle modal | done | |
+| BUN12 | Add `bundle` entity type to `EntityLink.EntityType` so bundles can be linked to other entities | done | |
+| BUN13 | Add `EntityType.BUNDLE` resolver to `_resolve_entity_name` in `links/serializers.py` | done | |
+| BUN14 | Sidebar nav: add "Bundles" entry with folder icon | done | |
+| BUN15 | Deploy (Phase 3): run `deploy-to-prod.ps1`, verify containers Up, smoke-test bundle CRUD via browser | done | |
 
 ---
 
@@ -160,7 +160,7 @@
 >
 > **Orchestration:**
 >
-> ```
+> ```text
 > POST /api/v1/links/recommend/document/<id>/
 >   Phase 1 (sync, fast):   rule-based text/address matching  → PENDING links
 >   Phase 2 (async Celery): OllamaLinkRecommender             → upgrades confidence / adds new links
@@ -181,15 +181,15 @@
 
 | # | Step | Status | Notes |
 | --- | --- | --- | --- |
-| OLL1 | `services/ai/link_recommender.py`: class `OllamaLinkRecommender` with `recommend(doc, context) → list[LinkSuggestion]`; prompt template; JSON parsing with fallback | pending | |
-| OLL2 | `apps/links/recommender.py`: add `recommend_for_document_ai(doc)` that builds full context (bundles included) and calls `OllamaLinkRecommender` | pending | Gated by `settings.OLLAMA_ENABLED`; skipped gracefully if Ollama offline |
-| OLL3 | Celery task `apps/links/tasks.py`: `run_ai_link_recommendations(doc_id)` — called async after OCR completes and after any bundle membership change | pending | |
-| OLL4 | `recommend_for_bundle(bundle_id)` — batch AI recommendation across all documents in a bundle; cross-document links for shared entities/topics | pending | `apps/links/recommender.py` |
-| OLL5 | Hook: after `BundleDocument` save, queue `run_ai_link_recommendations` for the newly added document | pending | `apps/bundles/models.py` post-save signal or viewset action |
-| OLL6 | Hook: after document OCR + AI labeling completes, queue `run_ai_link_recommendations` automatically | pending | `apps/documents/tasks.py` — already calls `analyze_document_with_ai`; extend pipeline |
-| OLL7 | Prompt context: include bundle paths in all existing AI prompts (document analyzer, auto-label) so Ollama can use bundle membership when suggesting tags/categories | pending | `services/ai/document_analyzer.py` |
-| OLL8 | Backend tests: `apps/links/tests/test_ai_recommender.py` — mock Ollama; test context builder, JSON parse fallback, bundle path injection | pending | `pytest.mark.unit` |
-| OLL9 | Deploy (Phase 3): run `deploy-to-prod.ps1`; verify Celery picks up new task; run manual recommendation on 1 document and inspect results | pending | |
+| OLL1 | `services/ai/link_recommender.py`: class `OllamaLinkRecommender` with `recommend(doc, context) → list[LinkSuggestion]`; prompt template; JSON parsing with fallback | done | |
+| OLL2 | `apps/links/recommender.py`: add `recommend_for_document_ai(doc)` that builds full context (bundles included) and calls `OllamaLinkRecommender` | done | |
+| OLL3 | Celery task `apps/links/tasks.py`: `run_ai_link_recommendations(doc_id)` — called async after OCR completes and after any bundle membership change | done | |
+| OLL4 | `recommend_for_bundle(bundle_id)` — batch AI recommendation across all documents in a bundle; cross-document links for shared entities/topics | done | |
+| OLL5 | Hook: after `BundleDocument` save, queue `run_ai_link_recommendations` for the newly added document | done | |
+| OLL6 | Hook: after document OCR + AI labeling completes, queue `run_ai_link_recommendations` automatically | done | |
+| OLL7 | Prompt context: include bundle paths in all existing AI prompts (document analyzer, auto-label) so Ollama can use bundle membership when suggesting tags/categories | done | |
+| OLL8 | Backend tests: `apps/links/tests/test_ai_recommender.py` — mock Ollama; test context builder, JSON parse fallback, bundle path injection | done | 19 tests |
+| OLL9 | Deploy (Phase 3): run `deploy-to-prod.ps1`; verify Celery picks up new task; run manual recommendation on 1 document and inspect results | done | Deployed 2026-04-03 |
 
 ---
 
@@ -204,7 +204,10 @@
 | I5 | `formatCurrency` missing currency param - all amounts showed EUR sign regardless of apartment currency | frontend | fixed | `e4c29da` |
 | I6 | Negative floor display: demisol apartments showed "floor 0" instead of "-1" | frontend | fixed | `ffe638b` |
 | I7 | Stale GHCR Docker image cached - prod did not pick up latest frontend build | infra | fixed | Deploy script now forces image pull |
-| I8 | 11 frontend npm vulns in dev-only build tools (esbuild, vite, vitest, workbox-build): 3 HIGH, 8 MOD | frontend/infra | accepted risk | All are dev-only build tools NOT included in production Docker image (nginx serves compiled static assets). No action required until next major Vite/Vitest release. |
+| I8 | 11 frontend npm vulns in dev-only build tools (esbuild, vite, vitest, workbox-build): 3 HIGH, 8 MOD | frontend/infra | fixed 2026-04-03 | Upgraded vite to v6.4.x, vitest to v3.2.x, added `serialize-javascript` override. 0 vulnerabilities remaining. |
+| I9 | Ghostfolio Docker image build fails with `TS5103: Invalid value for '--ignoreDeprecations'` | ghostfolio | known | Pre-existing Ghostfolio upstream issue (tsl-loader + TS version mismatch). Old `ghostfolio/familyhub:local` image keeps running; rebuild skipped until upstream fix. |
+| I10 | qwq:32b context window exhaustion: with 8192-token context and large system prompt, thinking chain fills output budget → truncated JSON | backend/ai | fixed 2026-04-03 | Changed `num_ctx` 8192→16384; replaced `PLATFORM_SYSTEM_PROMPT` (2455 tokens) with `DOCUMENT_ANALYSIS_SYSTEM_PROMPT` (<150 tokens) in document analysis; OCR truncation 4000→2000 chars; added `_repair_truncated_json()` fallback parser. |
+| I11 | qwq:32b `think=False` not fully disabling chain-of-thought | backend/ai | mitigated 2026-04-03 | `think=False` is sent as top-level Ollama API field (correct per docs) but qwq:32b still generates ~2000-3700 CoT tokens. Mitigated by: 16384 ctx (room for CoT + JSON), explicit "no <think>" in user prompt, `strip_think_tags()` safety net. |
 
 ---
 
@@ -232,7 +235,7 @@
 ## Architecture Notes
 
 - **Backend**: Django + Celery + PostgreSQL + Redis
-- **AI**: Ollama (`llama3.2:3b`, RTX 4070 Super via GPU), context window 8192
+- **AI**: Two Ollama instances — `ollama_primary` (qwq:32b, 22GB, 49% CPU/51% GPU split on RTX 4070 Super) for analysis/labeling/links; `ollama_translate` (llama3.2:3b, fast CPU) for translation. Context window 16384 (primary), 4096 (translate).
 - **Frontend**: React + Vite + TailwindCSS + i18n (ro/en)
 - **Investments**: Ghostfolio at `http://localhost:3333`; import scripts in `ghostfolio-src/familyhub/`
 - **Containers**: `familyhub_prod_backend`, `_celery_worker`, `_celery_beat`, `_frontend`, `_db`, `_redis`, `_ollama`, `_nginx`, `_scanner_watcher`, `_watchtower`
@@ -308,7 +311,7 @@
 | 62 | Ghostfolio investment tracker docker-compose added to stack | infra | 2026-03-29 |
 | 63 | Full i18n of BuildingDetail.tsx - all sub-components translated; TASK_STATUS_CONFIG/PRIORITY_CONFIG/TASK_TYPES changed to `labelKey` | frontend | 2026-03-29 |
 | 64 | Fix DB encoding corruption: restored corrupted Romanian chars in tasks, buildings, identities - caused by backup_production.ps1 piping pg_dump through PowerShell console (OEM->UTF-8 double-encoding) | backend | 2026-04-05 |
-| 65 | Fix backup_production.ps1: replaced `pg_dump | Out-File -Encoding utf8` with `pg_dump -f /tmp/...` + `docker cp` to preserve byte-for-byte encoding | infra | 2026-04-05 |
+| 65 | Fix backup_production.ps1: replaced `pg_dump \| Out-File -Encoding utf8` with `pg_dump -f /tmp/...` + `docker cp` to preserve byte-for-byte encoding | infra | 2026-04-05 |
 | 66 | ApartmentDetail: show legacy tenant (properties_tenant) in Linked People with delete button when no IdentityRole records exist | frontend | 2026-04-05 |
 | 67 | LegacyTenantModal: full edit/delete CRUD for properties_tenant via modal in ApartmentDetail (6 new Vitest tests) | frontend | `0b26d27` |
 | 68 | deploy-to-prod.ps1: STEP 3.5 auto-runs `manage.py migrate --no-input` before container restart; aborts on failure | e2e/infra | `32a5aa9` |
@@ -333,7 +336,9 @@
 | 86 | Lint + security sweep: 1211 flake8 issues → 0; 6 ESLint warnings → 0; Python CVEs: Pillow→>=12.1.1, cryptography→>=46.0; npm audit frontend 24→11 (remaining are dev-only build tools); npm audit e2e → 0 | all | 2026-04-02 |
 | 87 | security-audit.ps1: unified bandit/safety/flake8/ESLint/npm-audit report generator — added to deploy-to-prod.ps1 as STEP 0 (non-blocking) | e2e/infra | 2026-04-02 |
 | 88 | Paying roles (Tenant/Comodatar) financial features: per-role rent/due-day/currency overrides (inherit from apartment), warranty tracking (garantie de chirie) with paid/returned dates, partial payment ledger with surplus/deficit balance toggle — IdentityRole model extended, Payment.identity_role FK, new payment_summary + record_payment API actions, RoleAssignmentModal Financial+Warranty+Payments sections | backend+frontend | 2026-04-02 |
-| 89 | Dual-LLM architecture: QwQ:32b as reasoning/primary LLM (GPU, chain-of-thought, platform system prompt) + llama3.2:3b as translate LLM (CPU); two separate Ollama containers; strip_think_tags helper; _translate_summary step; comprehensive PLATFORM_SYSTEM_PROMPT FamilyHub knowledge base | backend+infra | 2026-04-03 |
+| 89 | Dual-LLM architecture: QwQ:32b as reasoning/primary LLM (GPU, chain-of-thought, platform system prompt) + llama3.2:3b as translate LLM (CPU); two separate Ollama containers; strip_think_tags helper;_translate_summary step; comprehensive PLATFORM_SYSTEM_PROMPT FamilyHub knowledge base | backend+infra | 2026-04-03 |
+| 90 | Fix qwq:32b OOM (HTTP 500 — model requires 9.4 GiB, only 4.8 GiB available): raise WSL2 memory to 28 GB (`.wslconfig`), add dedicated `celery_ai_worker --concurrency=1 -Q ai`, route AI tasks to `ai` queue via `CELERY_TASK_ROUTES`, set `OLLAMA_KEEP_ALIVE=30m` + `OLLAMA_NUM_PARALLEL=1` on ollama_primary | backend+infra | 2026-04-04 |
+| 91 | Fix qwq:32b GPU not used + model load hang (CUDA DMA cannot pin virtio-fs pages from Windows bind-mount): migrate ollama_primary model storage to Docker named volume (WSL2 ext4), add entrypoint pre-warm + retry loop, healthcheck via `ollama ps` (model-in-memory), `celery_ai_worker` depends on `service_healthy`, `OLLAMA_LOAD_TIMEOUT=10m`, `OLLAMA_KEEP_ALIVE=2h`, `.wslconfig memory=24GB` | backend+infra | 2026-04-04 |
 
 ---
 

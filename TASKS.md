@@ -49,7 +49,7 @@
 | P2 | Create `import_binance.py` - reads Binance transaction history CSV, outputs Ghostfolio JSON | done | `ghostfolio-src/familyhub/import_binance.py` |
 | P3 | Create `import_etoro.py` - reads eToro account statement XLSX/CSV, outputs Ghostfolio JSON | done | `ghostfolio-src/familyhub/import_etoro.py` |
 | P4 | Export CSV from Revolut app: Profile -> Statements -> Revolut Stocks | done | revolut_personal.csv in container /app/media/investments/ |
-| P5 | Export CSV from Binance: Orders -> Transaction History -> Export | pending | Drop binance_personal.csv in /app/media/investments/ then run import_investments |
+| P5 | Export CSV from Binance: Orders -> Transaction History -> Export | done | Binance holdings (SOL/PEPE/W/PIXEL) added directly from screenshot 2026-04-05 |
 | P6 | Export XLSX from eToro: Portfolio -> History -> Account Statement -> Download | pending | Drop etoro_personal.xlsx in /app/media/investments/ then run import_investments |
 | P7 | Fix `import_revolut.py` bugs: TYPE_MAP variants + microsecond dates + auth JWT exchange | done | Fixed 2026-04-05 |
 | P8 | Create `import_tradeville_snapshot.py` - converts snapshot CSV (sold/costm columns) to MANUAL BUY activities | done | `ghostfolio-src/familyhub/import_tradeville_snapshot.py` |
@@ -57,7 +57,9 @@
 | P10 | Import TradeVille Family (R3202A 12218×100) → Ghostfolio | done | 1 activity imported 2026-04-05 |
 | P11 | Import Revolut Personal net holdings (ADBE/AMZN/DELL/NKE/NOV1) → Ghostfolio | done | 5 activities imported 2026-04-05; MANUAL dataSource |
 | P12 | Import Binance holdings into Ghostfolio | pending | Drop binance.csv, run import_binance.py --post |
-| P13 | Import eToro holdings into Ghostfolio | pending | Drop etoro.xlsx, run import_etoro.py --post |
+| P13 | Import eToro holdings into Ghostfolio | pending | Drop etoro.xlsx, run import_etoro.py --post OR use new Chromium sync button |
+| P14 | Fix eToro file import encoding error (UTF-16/Windows-1252) | done | Fixed 2026-04-05; BOM detection + latin-1 fallback in _read_csv_rows |
+| P15 | Add Playwright Chromium scraper for eToro (no API key needed) | done | `etoro_scraper.py` + sync_etoro_web endpoint + "Sync via Chromium" button in UI |
 
 ---
 

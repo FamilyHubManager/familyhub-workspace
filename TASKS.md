@@ -195,6 +195,50 @@ Nothing currently active.
 
 ---
 
+## FamilyHub Finances (2026-04-05)
+
+> **Goal:** Create a first-class Finances section inside FamilyHub tracking two portfolios
+> (Personal, Family) across three brokers: Tradeville (snapshot CSV), Revolut (transaction CSV),
+> and eToro (REST API). Holdings are stored in the FamilyHub DB; the existing Ghostfolio link
+> remains for detailed analytics.
+>
+> **Data mapping:**
+>
+> - `Shared/portof_tradeville_Fusneica_Florentin.csv`:  `R3202A` → Family · `TVBETETF` → Personal
+> - `Family/portof_tradeville.csv`:  `R3202A` → Family (second account E9UK48)
+> - `Fusneica Florentin/revolut-trading-account-statement_*.csv` → Personal (transaction history)
+> - eToro API → Personal (crypto + stocks; keys in `.env`)
+>
+> **Model:**
+>
+> ```
+> Portfolio  (id, name, portfolio_type: personal|family, currency)
+> Holding    (portfolio, symbol, name, quantity, avg_cost, current_price,
+>             currency, asset_type, source, isin, notes, last_synced_at)
+> ```
+>
+> **API surface (`/api/v1/finances/`):**
+>
+> - `GET portfolios/` — list with holdings summary
+> - `GET portfolios/{id}/holdings/` — full holdings list
+> - `POST portfolios/{id}/import_tradeville/` — import Tradeville snapshot CSV
+> - `POST portfolios/{id}/import_revolut/` — import Revolut transaction CSV (computes net qty)
+> - `POST portfolios/{id}/sync_etoro/` — pull live positions from eToro Open API
+> - `PATCH holdings/{id}/` — manual update
+
+| # | Step | Status | Notes |
+| --- | --- | --- | --- |
+| FIN1 | `apps/finances/` Django app: Portfolio + Holding models, migrations | done | |
+| FIN2 | Tradeville CSV import service: parse tab-separated snapshot, map R3202A→Family / TVBETETF→Personal | done | ETF detection via name (actiuni tsim) |
+| FIN3 | Revolut CSV import service: parse transaction history, compute net quantity per symbol | done | 5 personal holdings imported |
+| FIN4 | eToro API service: fetch current portfolio positions via Open API using env-stored keys | done | Keys in .env.prod |
+| FIN5 | API views + URL registration: portfolios CRUD, import endpoints, holdings CRUD | done | |
+| FIN6 | React `Finances.tsx` page: Personal/Family tabs, holdings table, summary cards, import modal | done | |
+| FIN7 | Change nav "Investments" from external Ghostfolio link to internal `/finances` route | done | ghostfolioUrl removed, external refs cleaned |
+| FIN8 | i18n strings (ro/en), tests (backend pytest + frontend vitest), deploy | done | 13 backend + 202 frontend tests pass |
+
+---
+
 ## Known Issues
 
 | # | Issue | Area | Status | Notes |

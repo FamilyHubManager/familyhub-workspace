@@ -1,6 +1,6 @@
 # FamilyHub - Task Tracker
 
-> Updated: 2026-04-02
+> Updated: 2026-04-05
 > Branch: `release/v1.0.0`
 
 ---
@@ -384,6 +384,8 @@ Nothing currently active.
 | 89 | Dual-LLM architecture: QwQ:32b as reasoning/primary LLM (GPU, chain-of-thought, platform system prompt) + llama3.2:3b as translate LLM (CPU); two separate Ollama containers; strip_think_tags helper;_translate_summary step; comprehensive PLATFORM_SYSTEM_PROMPT FamilyHub knowledge base | backend+infra | 2026-04-03 |
 | 90 | Fix qwq:32b OOM (HTTP 500 — model requires 9.4 GiB, only 4.8 GiB available): raise WSL2 memory to 28 GB (`.wslconfig`), add dedicated `celery_ai_worker --concurrency=1 -Q ai`, route AI tasks to `ai` queue via `CELERY_TASK_ROUTES`, set `OLLAMA_KEEP_ALIVE=30m` + `OLLAMA_NUM_PARALLEL=1` on ollama_primary | backend+infra | 2026-04-04 |
 | 91 | Fix qwq:32b GPU not used + model load hang (CUDA DMA cannot pin virtio-fs pages from Windows bind-mount): migrate ollama_primary model storage to Docker named volume (WSL2 ext4), add entrypoint pre-warm + retry loop, healthcheck via `ollama ps` (model-in-memory), `celery_ai_worker` depends on `service_healthy`, `OLLAMA_LOAD_TIMEOUT=10m`, `OLLAMA_KEEP_ALIVE=2h`, `.wslconfig memory=24GB` | backend+infra | 2026-04-04 |
+| 92 | Finances feature: Django `apps/finances/` (Portfolio + Holding models, 3 import services: Tradeville/Revolut/eToro, DRF viewsets with `pagination_class=None`), React `Finances.tsx` page with portfolio tabs/holdings table/import modal, sidebar nav updated, management command `import_investments`, CSVs in persistent media volume, 13/13 backend + 202/202 frontend tests | backend+frontend | 2026-04-05 |
+| 93 | Fix Finances API URL double v1 prefix: `financeApi.ts` paths used `/v1/finances/...` but `VITE_API_URL=/api/v1` baked into prod build → combined to `/api/v1/v1/finances/...` (404). Fixed by removing leading `/v1/` from all paths in `financeApi.ts` | frontend | 2026-04-05 |
 
 ---
 

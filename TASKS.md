@@ -225,6 +225,8 @@ Nothing currently active.
 > - `POST portfolios/{id}/import_revolut/` — import Revolut transaction CSV (computes net qty)
 > - `POST portfolios/{id}/sync_etoro/` — pull live positions from eToro Open API
 > - `PATCH holdings/{id}/` — manual update
+- `POST portfolios/{id}/import_etoro/` — import eToro Account Statement XLSX/CSV (open positions)
+- `POST portfolios/{id}/import_binance/` — import Binance Trade History CSV (net crypto positions)
 
 | # | Step | Status | Notes |
 | --- | --- | --- | --- |
@@ -236,6 +238,10 @@ Nothing currently active.
 | FIN6 | React `Finances.tsx` page: Personal/Family tabs, holdings table, summary cards, import modal | done | |
 | FIN7 | Change nav "Investments" from external Ghostfolio link to internal `/finances` route | done | ghostfolioUrl removed, external refs cleaned |
 | FIN8 | i18n strings (ro/en), tests (backend pytest + frontend vitest), deploy | done | 13 backend + 202 frontend tests pass |
+| FIN9 | eToro Statement CSV/XLSX import service: parse Open Positions section → upsert Holdings | done | `apps/finances/services/etoro_import.py`; 90+ ticker mappings; CRYPTO/STOCK detection |
+| FIN10 | Binance Trade History CSV import service: Format A (Pair/Side) + Format B (Coin/Change) → net crypto positions | done | `apps/finances/services/binance_import.py`; stablecoin filtering; weighted avg cost |
+| FIN11 | `Holding.BINANCE` source choice + migration `0002_alter_holding_source.py` | done | Django migration applied to production |
+| FIN12 | ImportModal: add eToro statement (green, .xlsx/.csv) + Binance (yellow, .csv) sections; 374 backend + 202 frontend tests pass | done | `Finances.tsx`; `financeApi.ts` importEtoro/importBinance; deployed 2026-04-05 |
 
 ---
 

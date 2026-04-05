@@ -48,12 +48,16 @@
 | P1 | Create `import_revolut.py` - reads Revolut Stocks CSV export, outputs Ghostfolio JSON | done | `ghostfolio-src/familyhub/import_revolut.py` |
 | P2 | Create `import_binance.py` - reads Binance transaction history CSV, outputs Ghostfolio JSON | done | `ghostfolio-src/familyhub/import_binance.py` |
 | P3 | Create `import_etoro.py` - reads eToro account statement XLSX/CSV, outputs Ghostfolio JSON | done | `ghostfolio-src/familyhub/import_etoro.py` |
-| P4 | Export CSV from Revolut app: Profile -> Statements -> Revolut Stocks | pending | Requires Revolut app on phone; export as CSV |
-| P5 | Export CSV from Binance: Orders -> Transaction History -> Export | pending | Requires Binance account login; choose date range |
-| P6 | Export XLSX from eToro: Portfolio -> History -> Account Statement -> Download | pending | Requires eToro login; export as Excel |
-| P7 | Run each import script and verify output JSON | pending | Test with --dry-run flag first |
-| P8 | POST JSON to Ghostfolio API: `POST http://localhost:3333/api/v1/import` | pending | Set Bearer token from Ghostfolio Settings -> Security Token |
-| P9 | Verify imported holdings appear in Ghostfolio portfolio view | pending | Open <http://localhost:3333> and check Holdings tab |
+| P4 | Export CSV from Revolut app: Profile -> Statements -> Revolut Stocks | done | revolut_personal.csv in container /app/media/investments/ |
+| P5 | Export CSV from Binance: Orders -> Transaction History -> Export | pending | Drop binance_personal.csv in /app/media/investments/ then run import_investments |
+| P6 | Export XLSX from eToro: Portfolio -> History -> Account Statement -> Download | pending | Drop etoro_personal.xlsx in /app/media/investments/ then run import_investments |
+| P7 | Fix `import_revolut.py` bugs: TYPE_MAP variants + microsecond dates + auth JWT exchange | done | Fixed 2026-04-05 |
+| P8 | Create `import_tradeville_snapshot.py` - converts snapshot CSV (sold/costm columns) to MANUAL BUY activities | done | `ghostfolio-src/familyhub/import_tradeville_snapshot.py` |
+| P9 | Import TradeVille Personal (R3202A 1910×100, TVBETETF 158×28.32) → Ghostfolio | done | 2 activities imported 2026-04-05 |
+| P10 | Import TradeVille Family (R3202A 12218×100) → Ghostfolio | done | 1 activity imported 2026-04-05 |
+| P11 | Import Revolut Personal net holdings (ADBE/AMZN/DELL/NKE/NOV1) → Ghostfolio | done | 5 activities imported 2026-04-05; MANUAL dataSource |
+| P12 | Import Binance holdings into Ghostfolio | pending | Drop binance.csv, run import_binance.py --post |
+| P13 | Import eToro holdings into Ghostfolio | pending | Drop etoro.xlsx, run import_etoro.py --post |
 
 ---
 
@@ -225,6 +229,7 @@ Nothing currently active.
 > - `POST portfolios/{id}/import_revolut/` — import Revolut transaction CSV (computes net qty)
 > - `POST portfolios/{id}/sync_etoro/` — pull live positions from eToro Open API
 > - `PATCH holdings/{id}/` — manual update
+>
 - `POST portfolios/{id}/import_etoro/` — import eToro Account Statement XLSX/CSV (open positions)
 - `POST portfolios/{id}/import_binance/` — import Binance Trade History CSV (net crypto positions)
 

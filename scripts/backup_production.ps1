@@ -9,6 +9,9 @@ $Destinations = @("D:\Backups\FamilyHub_$Timestamp", "E:\Backups\FamilyHub_$Time
 $DbContainer = "familyhub_prod_db"
 $DbUser = "familyhub"
 $DbName = "familyhub"
+$GhostfolioDbContainer = "ghostfolio_db"
+$GhostfolioDbUser = "ghostfolio"
+$GhostfolioDbName = "ghostfolio"
 
 function Write-Step { param([string]$m); Write-Host "`n[$(Get-Date -Format 'HH:mm:ss')] $m" -ForegroundColor Cyan }
 function Write-OK { param([string]$m); Write-Host "  [OK]   $m" -ForegroundColor Green }
@@ -30,6 +33,10 @@ if ($validDests.Count -eq 0) { Write-Fail "No backup destinations available."; e
 $dbRunning = docker ps --filter "name=$DbContainer" --filter "status=running" --format "{{.Names}}" 2>$null
 if ($dbRunning) { Write-OK "DB container is running" }
 else { Write-Warn "DB container not running -- skipping pg_dump" }
+
+$ghostfolioDbRunning = docker ps --filter "name=$GhostfolioDbContainer" --filter "status=running" --format "{{.Names}}" 2>$null
+if ($ghostfolioDbRunning) { Write-OK "Ghostfolio DB container is running" }
+else { Write-Warn "Ghostfolio DB container not running -- skipping Ghostfolio pg_dump" }
 
 # --- Create dirs ---
 Write-Step "Creating backup directories"
@@ -58,11 +65,30 @@ if ($dbRunning) {
     }
 }
 
+# --- Ghostfolio pg_dump ---
+if ($ghostfolioDbRunning) {
+    Write-Step "Ghostfolio PostgreSQL dump"
+    foreach ($d in $validDests) {
+        $sqlPath = "$d\ghostfolio_db_$Timestamp.sql"
+        try {
+            docker exec $GhostfolioDbContainer pg_dump -U $GhostfolioDbUser $GhostfolioDbName -f /tmp/ghostfolio_backup_tmp.sql
+            docker cp "${GhostfolioDbContainer}:/tmp/ghostfolio_backup_tmp.sql" $sqlPath
+            docker exec $GhostfolioDbContainer rm -f /tmp/ghostfolio_backup_tmp.sql
+            $sz = (Get-Item $sqlPath).Length
+            if ($sz -gt 1024) { Write-OK "Saved $sqlPath ($([math]::Round($sz/1KB,1)) KB)" }
+            else { Write-Warn "Ghostfolio dump looks small ($sz bytes) -- verify: $sqlPath" }
+        }
+        catch {
+            Write-Fail "Ghostfolio pg_dump to $d failed: $_"
+        }
+    }
+}
+
 # --- Robocopy ---
 Write-Step "Robocopy data directories"
 # /COPY:DAT = Data+Attributes+Timestamps (no ACL), /Z = restartable, /XA:SH = skip system+hidden
 $roboArgs = @("/E", "/COPY:DAT", "/Z", "/R:2", "/W:3", "/NP", "/XA:SH")
-if (-not $IncludeOllama) { $roboArgs += @("/XD", "ollama") }
+if (-not $IncludeOllama) { $roboArgs += @("/XD", "ollama", "ollama_primary", "ollama_translate") }
 
 foreach ($d in $validDests) {
     Write-Host "  Copying: $Source --> $d" -ForegroundColor DarkCyan

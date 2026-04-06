@@ -57,9 +57,10 @@
 | P10 | Import TradeVille Family (R3202A 12218×100) → Ghostfolio | done | 1 activity imported 2026-04-05 |
 | P11 | Import Revolut Personal net holdings (ADBE/AMZN/DELL/NKE/NOV1) → Ghostfolio | done | 5 activities imported 2026-04-05; MANUAL dataSource |
 | P12 | Import Binance holdings into Ghostfolio | pending | Drop binance.csv, run import_binance.py --post |
-| P13 | Import eToro holdings into Ghostfolio | pending | Drop etoro.xlsx, run import_etoro.py --post OR use new Chromium sync button |
+| P13 | Import eToro holdings into Ghostfolio | pending | Drop etoro.xlsx, run import_etoro.py --post |
 | P14 | Fix eToro file import encoding error (UTF-16/Windows-1252) | done | Fixed 2026-04-05; BOM detection + latin-1 fallback in _read_csv_rows |
-| P15 | Add Playwright Chromium scraper for eToro (no API key needed) | done | `etoro_scraper.py` + sync_etoro_web endpoint + "Sync via Chromium" button in UI |
+| P15 | ~~Add Playwright Chromium scraper for eToro~~ | superseded | Replaced by P16 |
+| P16 | eToro Live Sync via Public API (user-supplied keys in UI) | done | Rewrote `etoro_api.py` to use `public-api.etoro.com`; keys sent per-request from browser; `localStorage` persistence; `sync_etoro_web` endpoint removed |
 
 ---
 
@@ -249,6 +250,38 @@ Nothing currently active.
 | FIN10 | Binance Trade History CSV import service: Format A (Pair/Side) + Format B (Coin/Change) → net crypto positions | done | `apps/finances/services/binance_import.py`; stablecoin filtering; weighted avg cost |
 | FIN11 | `Holding.BINANCE` source choice + migration `0002_alter_holding_source.py` | done | Django migration applied to production |
 | FIN12 | ImportModal: add eToro statement (green, .xlsx/.csv) + Binance (yellow, .csv) sections; 374 backend + 202 frontend tests pass | done | `Finances.tsx`; `financeApi.ts` importEtoro/importBinance; deployed 2026-04-05 |
+| FIN13 | EditHoldingModal + createHolding: full manual CRUD (add/edit/delete) with portfolio field on serializer; R3202A added to Personal | done | `d7f7e93` 2026-04-06 |
+
+---
+
+## Finances v2 — Portfolio Moves, Live Prices, Deposit Interest, Ghostfolio Mirror (2026-04-06)
+
+> **Goal:** Complete the finances section with:
+> 1. Move any position between portfolios with sync-safe routing (`pinned_portfolio` FK)
+> 2. Per-tab P/L display (Personal / Family / All)
+> 3. Live ticker price refresh via Yahoo Finance (`yfinance`, no key needed)
+> 4. Dynamic deposit/bond interest accrual (rate_pct + start_date → computed current value)
+> 5. Ghostfolio mirror: push FamilyHub holdings to Ghostfolio via its REST API
+
+| # | Step | Status | Notes |
+| --- | --- | --- | --- |
+| FIN14 | `Holding` model: add `pinned_portfolio` FK (nullable; sync-safe move target), `rate_pct` (annual %), `start_date`, `maturity_date` DateFields; migration `0003_holding_move_deposit_fields` | done | |
+| FIN15 | `Holding.effective_current_price` property: returns `avg_cost * (1 + rate_pct/100 * elapsed/365)` when deposit fields set; else falls back to `current_price`; `current_value`/`gain_loss`/`gain_loss_pct` use it | done | |
+| FIN16 | `HoldingViewSet.move()` action: `POST /finances/holdings/{id}/move/` with `{"target_portfolio":id}` — sets `portfolio` + `pinned_portfolio`; merges if target already has same symbol+source | done | |
+| FIN17 | `etoro_api.sync_etoro_portfolio()` sync-safe: skip deleting pinned holdings; route pinned symbols to their `pinned_portfolio` instead of the sync's origin portfolio | done | |
+| FIN18 | `ticker_service.py` — `yfinance`-based price fetcher: batch fetch, skip Romanian-only symbols (no Yahoo data), return `{symbol: price_or_None}`; `yfinance>=0.2` added to requirements.txt | done | |
+| FIN19 | `PortfolioViewSet.refresh_prices()` action: `POST /finances/portfolios/{id}/refresh_prices/` — updates `current_price` for all holdings with yfinance data; returns updated count | done | |
+| FIN20 | `PortfolioViewSet.compute_deposit_prices()` action: `POST /finances/portfolios/{id}/compute_deposit_prices/` — recalculates `current_price` from `rate_pct + start_date` for all bond/cash holdings with those fields; also triggers on holding save when rate fields change | done | |
+| FIN21 | `ghostfolio_sync.py` service: `sync_portfolio_to_ghostfolio(portfolio, token, url)` — converts FamilyHub holdings to Ghostfolio `CreateOrderDto` (MANUAL BUY at avg_cost); uses Ghostfolio REST `/api/v1/import` | done | |
+| FIN22 | `PortfolioViewSet.sync_to_ghostfolio()` action: `POST .../sync_to_ghostfolio/` with `{"token": "...", "url": "http://..."}` — calls ghostfolio_sync service | done | |
+| FIN23 | `HoldingSerializer`: add `rate_pct`, `start_date`, `maturity_date`, `pinned_portfolio` to fields + `effective_current_price` method field | done | |
+| FIN24 | Frontend `financeApi.ts`: update `Holding` type (new fields); add `moveHolding`, `refreshPrices`, `refreshAllPrices`, `computeDepositPrices`, `syncToGhostfolio` | done | |
+| FIN25 | Frontend P/L per tab: summary cards show P/L for active tab (Personal / Family / All) instead of always-all | done | |
+| FIN26 | `EditHoldingModal`: add Move-to-portfolio section (portfolio dropdown, submit updates `pinned_portfolio`); add Deposit fields (rate_pct, start_date, maturity_date) shown for bond/cash asset types | done | |
+| FIN27 | Finances page: "Refresh prices" button (runs yfinance for visible portfolio); Ghostfolio settings panel (token + URL stored in localStorage like eToro keys) + "Sync to Ghostfolio" button | done | |
+| FIN28 | Backend tests: move action, sync-safe routing, deposit price calc, ticker service mock | done | |
+| FIN29 | Frontend tests: P/L tab switching, move modal, deposit field display | done | |
+| FIN30 | Deploy + verify all prod containers Up + smoke test each new feature | done | |
 
 ---
 

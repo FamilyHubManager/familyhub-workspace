@@ -9,11 +9,28 @@ Do not skip phases. Do not report "done" until the deploy step has completed.
 
 ---
 
+## Phase 0 — Read and Update TASKS.md
+
+**Before starting any work**, read `familyhub-workspace/TASKS.md` to understand what is planned, in-progress, and done.
+
+- Find the relevant task row(s) for the work about to be done.
+- Mark them as **in-progress** before touching any code.
+- If the user's request maps to no existing task, add a new row/section before proceeding.
+
+**After completing and deploying** every feature or fix:
+
+- Mark each completed task row as **done** in `TASKS.md`.
+- If new issues or follow-up tasks were discovered, add them to the **Known Issues** or **Backlog** table.
+- Commit the updated `TASKS.md` together with the feature commit (same push).
+
+---
+
 ## Phase 1 — Write Tests
 
 Add tests to **every repo that was changed**. Match the test style already used in that repo.
 
 ### Backend (Django / pytest)
+
 - Test files live under the affected app: `familyhub-backend/apps/<app>/tests/` or alongside the module as `test_*.py`
 - Naming: `test_<feature>.py`, class `Test<Feature>`, methods `test_<scenario>`
 - Use `pytest.mark.unit` for pure logic, `pytest.mark.integration` for DB/API tests
@@ -21,12 +38,14 @@ Add tests to **every repo that was changed**. Match the test style already used 
 - Cover: happy path, validation errors, edge cases (empty, null, boundary values)
 
 ### Frontend (React / Vitest)
+
 - Test files: `familyhub-frontend/src/__tests__/<Component>.test.tsx` or co-located `<Component>.test.tsx`
 - Use `@testing-library/react` + `vi.mock` for API calls
 - Run with: `npm run test -- --run` (inside `familyhub-frontend/`)
 - Cover: renders without crash, user interactions, API mock responses
 
 ### E2E (Playwright)
+
 - Test files live in `familyhub-e2e/tests/`
 - Only add E2E tests for user-facing flows that touch multiple services (not every micro-change)
 - Run smoke suite with: `npx playwright test --grep @smoke` (inside `familyhub-e2e/`)
@@ -53,24 +72,30 @@ Then commit the generated `migrations/00XX_*.py` file.
 Run all tests locally and confirm every test is green before moving to Phase 3.
 
 ### Backend
+
 ```powershell
 cd familyhub-backend
 pytest apps/ -v --tb=short
 ```
+
 All tests must pass (`0 failed`). Fix failures before continuing.
 
 ### Frontend
+
 ```powershell
 cd familyhub-frontend
 npm run test -- --run
 ```
+
 All tests must pass. Fix failures before continuing.
 
 ### E2E (when applicable)
+
 ```powershell
 cd familyhub-e2e
 npx playwright test 00-smoke.spec.ts
 ```
+
 Must exit `0`. If the dev stack is not running, start it first.
 
 Only proceed to Phase 3 when **every test suite returns 0 failures**.
@@ -87,6 +112,7 @@ cd familyhub-e2e\scripts
 ```
 
 This script (in order):
+
 1. Pushes git changes to origin
 2. Builds updated Docker images
 3. **Runs `python manage.py migrate --no-input`** inside a temporary backend container — aborts if migrations fail
@@ -95,9 +121,11 @@ This script (in order):
 6. Updates the Ghostfolio stack (`ghostfolio-src/familyhub/docker-compose.yml`)
 
 After the script exits `0`, confirm the deploy by checking container health:
+
 ```powershell
 docker ps --format "table {{.Names}}\t{{.Status}}" | Select-String "familyhub_prod|ghostfolio"
 ```
+
 All prod containers must show `Up`.
 
 ---
@@ -107,6 +135,7 @@ All prod containers must show `Up`.
 Once all prod containers show `Up`, **manually verify** that the feature works correctly in the live environment before committing code.
 
 ### Production smoke check
+
 - Open the app in the browser (or use `curl`/Playwright) and confirm the feature behaves correctly end-to-end on the actual production data.
 - Check backend logs for any runtime errors: `docker logs familyhub_prod_backend --tail 50`
 - Only if everything looks correct, proceed to commit.

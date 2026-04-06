@@ -257,6 +257,7 @@ Nothing currently active.
 ## Finances v2 — Portfolio Moves, Live Prices, Deposit Interest, Ghostfolio Mirror (2026-04-06)
 
 > **Goal:** Complete the finances section with:
+>
 > 1. Move any position between portfolios with sync-safe routing (`pinned_portfolio` FK)
 > 2. Per-tab P/L display (Personal / Family / All)
 > 3. Live ticker price refresh via Yahoo Finance (`yfinance`, no key needed)
@@ -285,10 +286,34 @@ Nothing currently active.
 
 ---
 
+## Feature: Automatic Utility Bill Retrieval
+
+> Automated fetching, parsing, and tracking of utility invoices (electricity, gas, water, internet) via email polling + web scraping.
+
+| # | Step | Status | Notes |
+| --- | --- | --- | --- |
+| UTIL1 | Models: `UtilityAccount` (apartment + provider + credentials), `UtilityEmailInbox` (IMAP config), Invoice field extensions (`utility_account` FK, `consumption_data` JSON, `source` enum) | done | Migrations applied |
+| UTIL2 | Admin registration for `UtilityAccount` and `UtilityEmailInbox` | done | |
+| UTIL3 | `services/utilities/email_processor.py` — IMAP inbox polling; downloads PDF attachments matching `email_sender_pattern`; calls `process_utility_document` task | done | |
+| UTIL4 | `services/utilities/ai_extractor.py` — Gemma 4 post-OCR invoice parser; extracts provider, invoice number, amount, dates, consumption; creates/updates Invoice records | done | |
+| UTIL5 | Romanian decimal format handling: `_parse_decimal()` helper normalises "2.367,564" and "122,75" formats before Decimal conversion | done | |
+| UTIL6 | Provider scrapers (Playwright): `base.py` abstract + `digi.py`, `apanova.py`, `hidroelectrica.py`, `engie.py` | done | |
+| UTIL7 | Celery tasks: `fetch_utility_emails`, `scrape_utility_account`, `sync_all_utility_accounts`, `process_utility_document`, `check_utility_due_dates` | done | |
+| UTIL8 | Beat schedule entries: `fetch-utility-emails-every-4h` (14400s), `check-utility-due-dates-daily` (crontab 08:00) | done | |
+| UTIL9 | REST API: `UtilityAccountViewSet` at `/api/v1/properties/utility-accounts/`; actions: `sync/`, `invoices/`, `sync_all_accounts/` | done | |
+| UTIL10 | Frontend: `UtilityAccountsSection.tsx` component + "Utilities" tab added to `ApartmentDetail.tsx` | done | |
+| UTIL11 | Backend tests: 15 model/API/extractor/email tests (`test_utility_accounts.py`) — all pass | done | |
+| UTIL12 | Provider-specific extraction tests: 36 tests using redacted real-bill OCR fixtures for all 4 providers (`test_invoice_extraction_providers.py`); covers per-building vs apartment extraction, Romanian decimal format, penalties, regularisation invoices | done | |
+| UTIL13 | Deploy to production | done | 2026-04-06 |
+
+---
+
 ## Known Issues
 
 | # | Issue | Area | Status | Notes |
 | --- | --- | --- | --- | --- |
+| I12 | Celery beat scheduler broken: `CELERY_BEAT_SCHEDULER=DatabaseScheduler` in settings.py but `django_celery_beat` not in INSTALLED_APPS → beat fell back to stale shelve with only 1 entry (`check-stale-whatsapp-sessions`) → all watchdog tasks never firing | backend/infra | fixed 2026-04-06 | Removed `CELERY_BEAT_SCHEDULER` from settings.py (uses default `PersistentScheduler`); moved `check-stale-whatsapp-sessions` into static `app.conf.beat_schedule` in `config/celery.py`; deleted stale shelve file; restarted beat container. All 3 watchdogs (`ocr-watchdog-every-minute`, `ai-labeling-watchdog-every-5min`, `check-stale-whatsapp-sessions`) confirmed firing. |
+| I13 | 54 documents stuck (25 `IN_PROCESSING` + 29 `FAILED` with `model 'gemma4:27b' not found`) — caused by old model name before `feat: switchable Ollama model` commit | backend/ai | fixed 2026-04-06 | Manually reset to `not_processed`; re-queued 54 documents; all now processing with correct `gemma4:26b` model. |
 | I1 | Apartment 4 (Tineretului 29A Ap.1) legacy tenant not editable | frontend | fixed 2026-04-05 | Legacy `properties_tenant` row shown in ApartmentDetail Linked People with delete button |
 | I2 | Document scanner queue stuck on test file | backend | fixed 2026-04-05 | Removed `e2e_test_1773866692569.pdf` from scanner_inbox in both dev and prod containers |
 | I3 | Scanner watcher processes e2e test files left in inbox | backend | fixed | Filename prefix filter in `scanner_watcher.py` + `_process_existing_files` ignores `e2e_test_*` files |

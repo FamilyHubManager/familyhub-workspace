@@ -305,6 +305,12 @@ Nothing currently active.
 | UTIL11 | Backend tests: 15 model/API/extractor/email tests (`test_utility_accounts.py`) — all pass | done | |
 | UTIL12 | Provider-specific extraction tests: 36 tests using redacted real-bill OCR fixtures for all 4 providers (`test_invoice_extraction_providers.py`); covers per-building vs apartment extraction, Romanian decimal format, penalties, regularisation invoices | done | |
 | UTIL13 | Deploy to production | done | 2026-04-06 |
+| UTIL14 | Bug fixes: `email_processor.py` — invalid `source='upload'`/`notes=` fields removed, UNSEEN→SINCE date filter (30-day lookback), `apartment`/`building` added to Document creation | done | 2026-04-07 |
+| UTIL15 | Bug fix: `apps/documents/tasks.py` — post-OCR Celery trigger for `process_utility_document` was missing; added conditional trigger when `metadata.utility_account_id` is set | done | 2026-04-07 |
+| UTIL16 | Bug fix: `services/utilities/ai_extractor.py` — multi-account cross-check: after AI extracts `account_number`, reassign Document to correct `UtilityAccount` by `provider+account_number` if mismatched (fixes all 6 Hidroelectrica accounts sharing same `email_sender_pattern`) | done | 2026-04-07 |
+| UTIL17 | OCR fix: `services/ocr/tesseract.py` — `_try_pdftotext()` fast path: use `pdftotext` (poppler) before Tesseract for text-based PDFs; avoids 1GB OOM kill caused by 7-page PDFs being rendered at 300 DPI (~182MB+) | done | 2026-04-07 |
+| UTIL18 | Production DB: set `email_sender_pattern='crm@hidroelectrica.ro'` for all 6 Hidroelectrica accounts | done | 2026-04-07 |
+| UTIL19 | First email import run: 9 documents created (7 Hidroelectrica + 2 Apa Nova); 9 invoices extracted with correct per-account assignment via AI account cross-check | done | 2026-04-07 |
 
 ---
 

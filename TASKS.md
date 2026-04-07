@@ -311,6 +311,15 @@ Nothing currently active.
 | UTIL17 | OCR fix: `services/ocr/tesseract.py` — `_try_pdftotext()` fast path: use `pdftotext` (poppler) before Tesseract for text-based PDFs; avoids 1GB OOM kill caused by 7-page PDFs being rendered at 300 DPI (~182MB+) | done | 2026-04-07 |
 | UTIL18 | Production DB: set `email_sender_pattern='crm@hidroelectrica.ro'` for all 6 Hidroelectrica accounts | done | 2026-04-07 |
 | UTIL19 | First email import run: 9 documents created (7 Hidroelectrica + 2 Apa Nova); 9 invoices extracted with correct per-account assignment via AI account cross-check | done | 2026-04-07 |
+| UTIL20 | Backend: extend `InvoiceSerializer` with `days_overdue`, `grace_period_end`, `utility_account_label`, `invoice_type_display`, `document_id` fields | done | 2026-04-08 |
+| UTIL21 | Backend: add `InvoiceViewSet` actions — `apartment_dashboard`, `building_dashboard`, `properties_overview` — for per-apt/building/cross-property utility summaries | done | 2026-04-08 |
+| UTIL22 | Backend: auto-tag Document records with "Utility" + "Bill" categories and `utility_bill` / `{type}_utility` tags in `ai_extractor.py` whenever an invoice is created from email | done | 2026-04-08 |
+| UTIL23 | Backend: add `lookback_days` param to `poll_inbox()`; run one-shot 365-day historical extraction for all providers | done | 2026-04-08 |
+| UTIL24 | Frontend: create `UtilityDashboard.tsx` component — summary cards, type-filter chips, invoice list with status badges and mark-paid action | done | 2026-04-08 |
+| UTIL25 | Frontend: upgrade `ApartmentDetail.tsx` utilities tab — replace `UtilityAccountsSection` with `UtilityDashboard` | done | 2026-04-08 |
+| UTIL26 | Frontend: add Utilities tab to `BuildingDetail.tsx` using `UtilityDashboard` in building mode | done | 2026-04-08 |
+| UTIL27 | Frontend: add utility overview section to `Properties.tsx` — show all buildings' pending/overdue bill situation via `properties_overview` endpoint | done | 2026-04-08 |
+| UTIL28 | Tests: backend `test_utility_dashboard.py` + frontend `UtilityDashboard.test.tsx` | done | 2026-04-08 |
 
 ---
 

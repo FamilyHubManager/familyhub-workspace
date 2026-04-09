@@ -5,6 +5,23 @@
 
 ---
 
+## Utility Tab: Meter Readings / Indici (2026-04-09)
+
+> **Goal:** Track monthly meter index readings (indici) per utility account for Engie (m³),
+> Hidroelectrica (kWh), and Apanova (m³). Also fix FAB overlap and admin link 404.
+
+| # | Step | Status | Notes |
+| --- | --- | --- | --- |
+| U1 | Add `MeterReading` model to `apps/properties/models.py` | done | migration 0013_meter_reading.py |
+| U2 | Add `MeterReadingSerializer` + `MeterReadingViewSet` + URL `/api/v1/properties/meter-readings/` | done | filterset_fields: utility_account |
+| U3 | Register `MeterReadingAdmin` in Django admin | done | |
+| U4 | Add `MeterReadingsInline` component in UtilityDashboard — Readings toggle per account | done | Only for engie/hidroelectrica/apanova |
+| U5 | Fix FAB overlap — change `py-4` to `pt-4 pb-24` on UtilityDashboard root div | done | 96px bottom clearance |
+| U6 | Fix admin URL — use changelist with `?apartment__id__exact=N` filter | done | Deployed in previous session |
+| U7 | Tests: 10 backend (pytest) + 5 frontend (vitest) | done | 494 backend + 230 frontend all pass |
+
+---
+
 ## Ghostfolio Integration - Merge + E2E (2026-03-30)
 
 > **Goal:** merge `ghostfolio/` scripts into `ghostfolio-src/familyhub/`, wire ghostfolio into

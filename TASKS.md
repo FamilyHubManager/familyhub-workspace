@@ -1,11 +1,58 @@
 # FamilyHub - Task Tracker
 
-> Updated: 2026-04-09
+> Updated: 2026-04-10
 > Branch: `release/v1.0.0`
 
 ---
 
-## Utility Tab: Meter Readings / Indici (2026-04-09)
+## UI Fixes + History Backfill (2026-04-10)
+
+> **Goal:** Fix broken PDF link, admin URL for UtilityAccount, add PDF preview to DocumentQueue,
+> and run the one-time full utility history pull.
+
+| # | Step | Status | Notes |
+| --- | --- | --- | --- |
+| F1 | Fix PDF link 404 — add `document_file_url` to `InvoiceSerializer`/`InvoiceListSerializer`; use it in `UtilityDashboard.tsx` | done | Opens `/media/documents/...` directly in new tab |
+| F2 | Fix admin URL 404 — add `apartment` to `list_filter` in `UtilityAccountAdmin` | done | `?apartment__id__exact=N` now accepted by Django admin |
+| F3 | Add PDF preview to `DocumentQueue` — Eye button on processing + failed items, fetches file URL via API | done | `openDocumentPreview()` helper; works for all items with DB IDs |
+| F4 | Run one-time full history pull — `pull_utility_history(lookback_days=730)` triggered on production | done | 11 → 41+ invoices; email backfill (Hidroelectrica, Apa Nova, ENGIE) working |
+| F5 | Tests and deploy | done | |
+
+---
+
+## Utility History Backfill + Monthly Statistics (2026-04-09)
+
+> **Goal:** backfill all historical invoices from ENGIE portal and email inboxes;
+> add a monthly cost history chart per apartment/building; add "Pull history" button.
+
+| # | Step | Status | Notes |
+| --- | --- | --- | --- |
+| H1 | Fix Playwright browser crash flags — add 9 Chrome flags to `base.py` and `engie.py` | done | `--disable-gpu`, `--no-zygote`, etc. |
+| H2 | Refactor `EngieScraper._parse_and_download` → `_download_all_missing` | done | Iterates ALL invoices; downloads via `requests` + browser cookies |
+| H3 | Add `pull_utility_history` Celery task — email backfill + portal scrapes | done | `lookback_days=730` default (2 years) |
+| H4 | Add `pull_all_history` action to `UtilityAccountViewSet` | done | `POST /api/v1/properties/utility-accounts/pull_all_history/` |
+| H5 | Add `monthly_stats` action to `InvoiceViewSet` | done | `GET /api/v1/payments/invoices/monthly_stats/?apartment_id=N&months=24` |
+| H6 | Frontend: `MonthlyTrends` collapsible bar chart in `UtilityDashboard` | done | Stacked per invoice_type, last 12 months, CSS-only |
+| H7 | Frontend: "Pull history" button in AccountsPanel → calls `pull_all_history` | done | |
+| H8 | Backend tests: 10 for monthly_stats + 9 for pull_all_history task/action | done | 513 backend tests pass |
+| H9 | Frontend tests: MonthlyTrends (4) + Pull history (2) added to existing suite | done | 236 frontend tests pass |
+| H9 | Deploy to production | done | All prod containers Up; committed + pushed both repos |
+
+---
+
+## Known Issues / Backlog
+
+| # | Issue | Priority |
+| --- | --- | --- |
+| B1 | ~~Hidroelectrica + Apanova portal scraping blocked — DNS fails from Docker~~ — **resolved via email backfill** | done |
+| B2 | ENGIE portal scraper crashes for accounts 2, 4, 5, 16, 18 — `Page crashed` (Playwright memory/concurrency); accounts 3, 11, 12, 17 work fine | high |
+| B3 | DIGI portal scraper crashes for both accounts (7, 8) — `Page.fill: Page crashed` (same memory issue as B2) | high |
+| B4 | ENGIE historical invoices missing for accounts with no portal login history (163B Ap.1, 163B Ap.4, 163B commons, 31A Ap.2, 31A Ap.31) — need portal fix (B2) | medium |
+| B5 | DIGI invoices: 0 total — need portal fix (B3) before any history can be pulled | medium |
+| B6 | WhatsApp container restarting — pre-existing, unrelated to this feature | low |
+| B7 | Ghostfolio Docker build fails with `--ignoreDeprecations` TS error — pre-existing | low |
+
+---
 
 > **Goal:** Track monthly meter index readings (indici) per utility account for Engie (m³),
 > Hidroelectrica (kWh), and Apanova (m³). Also fix FAB overlap and admin link 404.

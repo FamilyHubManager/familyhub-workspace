@@ -1,6 +1,6 @@
 # FamilyHub - Task Tracker
 
-> Updated: 2026-04-05
+> Updated: 2026-04-09
 > Branch: `release/v1.0.0`
 
 ---
@@ -283,6 +283,8 @@ Nothing currently active.
 | FIN28 | Backend tests: move action, sync-safe routing, deposit price calc, ticker service mock | done | |
 | FIN29 | Frontend tests: P/L tab switching, move modal, deposit field display | done | |
 | FIN30 | Deploy + verify all prod containers Up + smoke test each new feature | done | |
+| GHF1 | Backend: `GET /api/v1/finances/ghostfolio-auth/` — exchanges stored `GHOSTFOLIO_SECURITY_TOKEN` for a short-lived Ghostfolio JWT; returns `{authToken, url}` to the frontend | done | 2026-04-09 |
+| GHF2 | Frontend: Finances.tsx auto-fetches Ghostfolio token on panel open (no manual paste); adds "Open Ghostfolio" external link when token+URL available | done | 2026-04-09 |
 
 ---
 
@@ -320,6 +322,7 @@ Nothing currently active.
 | UTIL26 | Frontend: add Utilities tab to `BuildingDetail.tsx` using `UtilityDashboard` in building mode | done | 2026-04-08 |
 | UTIL27 | Frontend: add utility overview section to `Properties.tsx` — show all buildings' pending/overdue bill situation via `properties_overview` endpoint | done | 2026-04-08 |
 | UTIL28 | Tests: backend `test_utility_dashboard.py` + frontend `UtilityDashboard.test.tsx` | done | 2026-04-08 |
+| UTIL29 | Frontend: `AccountsPanel` in `UtilityDashboard` — collapsible panel listing configured utility accounts, with sync buttons and direct admin link to add new accounts | done | 2026-04-09 |
 
 ---
 
